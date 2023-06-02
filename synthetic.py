@@ -2,6 +2,11 @@ import cv2 as cv
 import os
 import argparse
 
+
+parser = argparse.ArgumentParser()
+parser.parse_args()
+
+
 def obj_list():
     PATH_MAIN='data'
     try: 
@@ -36,5 +41,4 @@ def obj_list():
         pass
 
 obj_list()
-
 
