@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 #add optional arguments
-parser.add_argument("-src", "-src_directory", help="the source directory containing your training dataset")
+parser.add_argument("-src", "-src_directory", type=os.path.abspath, help="the source directory containing your training dataset")
 args=parser.parse_args()
 
 def obj_list():
@@ -49,6 +49,8 @@ def obj_list():
 
 if args.src:
     obj_list()
+else:
+    print("no source directory given. Please use python3 synthetic.py -h to learn more.")
 
 
 
