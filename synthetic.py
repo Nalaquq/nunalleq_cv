@@ -4,11 +4,13 @@ import argparse
 
 
 parser = argparse.ArgumentParser()
-parser.parse_args()
-
+#add optional arguments
+parser.add_argument("-src", "-src_directory", help="the source directory containing your training dataset")
+args=parser.parse_args()
 
 def obj_list():
-    PATH_MAIN='data'
+    #include optional positional argument
+    PATH_MAIN=args.src
     try: 
         obj_dict ={}
         folder_count=len(next(os.walk(PATH_MAIN))[1])
@@ -40,5 +42,13 @@ def obj_list():
         print("An error occurred. Ensure that your files are ordered and sorted into images and masks correctly.")
         pass
 
-obj_list()
+
+
+
+
+
+if args.src:
+    obj_list()
+
+
 
