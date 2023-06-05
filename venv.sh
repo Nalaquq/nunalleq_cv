@@ -1,6 +1,7 @@
 #! /bin/bash
 source "venv/bin/activate"
 tree -I venv > tree.md
+find . -name "*:Zone.Identifier" -type f -delete
 
 
 

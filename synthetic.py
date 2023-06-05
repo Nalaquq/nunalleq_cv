@@ -9,7 +9,7 @@ parser.add_argument("-src", "-src_directory", type=os.path.abspath, help="the so
 args=parser.parse_args()
 
 def obj_list():
-    #include optional positional argument
+    #could fix this solution with try/except blocks
     PATH_MAIN=args.src
     try: 
         obj_dict ={}
@@ -17,7 +17,7 @@ def obj_list():
         for f in range(folder_count):
             obj_dict[f]={'folder': next(os.walk(PATH_MAIN))[1][f],'longest_min': 150, 'longest_max': 800}
         #delete the "baclkground images" since it does not have the same directory structure
-        del obj_dict[0]
+        del obj_dict[1]
     except: 
         print(f"didn't work is {PATH_MAIN} a directory?")
         pass
@@ -38,19 +38,19 @@ def obj_list():
         files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, 'background')))
         files_bg_imgs = [os.path.join(PATH_MAIN, 'background', f) for f in files_bg_imgs]
         print("\nThe first five files from the sorted list of background images:", files_bg_imgs[:5])
+        return(obj_dict)
     except:
         print("An error occurred. Ensure that your files are ordered and sorted into images and masks correctly.")
         pass
-
-
-
-
 
 
 if args.src:
     obj_list()
 else:
     print("no source directory given. Please use python3 synthetic.py -h to learn more.")
+
+
+
 
 
 
