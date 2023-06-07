@@ -20,6 +20,75 @@ args = parser.parse_args()
 
 
 # need to fix with try/except loop. Include obj_dict[1] background
+if args.src:
+    PATH_MAIN = args.src
+else:
+    print(
+        "no source directory given. Please use python3 synthetic.py -h to learn more."
+    )
+
+
+obj_dict = {
+    1: {"folder": "caveg", "longest_min": 150, "longest_max": 800},
+    2: {"folder": "endblades", "longest_min": 150, "longest_max": 800},
+    3: {"folder": "tops", "longest_min": 150, "longest_max": 800},
+    4: {"folder": "ulus", "longest_min": 150, "longest_max": 800},
+}
+
+for k, _ in obj_dict.items():
+    folder_name = obj_dict[k]["folder"]
+
+    files_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "images")))
+    files_imgs = [os.path.join(PATH_MAIN, folder_name, "images", f) for f in files_imgs]
+
+    files_masks = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "masks")))
+    files_masks = [
+        os.path.join(PATH_MAIN, folder_name, "masks", f) for f in files_masks
+    ]
+
+    obj_dict[k]["images"] = files_imgs
+    obj_dict[k]["masks"] = files_masks
+    print(f"\nThe first five files from directory the sorted list of images in {folder_name}:",
+                obj_dict[k]["images"][:5],
+            )
+    print(f"\nThe first five files from the sorted list of masks in {folder_name}:",
+                obj_dict[k]["masks"][:5],
+            )
+print(
+    "The first five files from the sorted list of battery images:",
+    obj_dict[1]["images"][:5],
+)
+print(
+    "\nThe first five files from the sorted list of battery masks:",
+    obj_dict[1]["masks"][:5],
+)
+
+files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "background")))
+files_bg_imgs = [os.path.join(PATH_MAIN, "background", f) for f in files_bg_imgs]
+
+files_bg_noise_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "bg_noise", "images")))
+files_bg_noise_imgs = [
+    os.path.join(PATH_MAIN, "bg_noise", "images", f) for f in files_bg_noise_imgs
+]
+files_bg_noise_masks = sorted(os.listdir(os.path.join(PATH_MAIN, "bg_noise", "masks")))
+files_bg_noise_masks = [
+    os.path.join(PATH_MAIN, "bg_noise", "masks", f) for f in files_bg_noise_masks
+]
+
+print(
+    "\nThe first five files from the sorted list of background images:",
+    files_bg_imgs[:5],
+)
+print(
+    "\nThe first five files from the sorted list of background noise images:",
+    files_bg_noise_imgs[:5],
+)
+print(
+    "\nThe first five files from the sorted list of background noise masks:",
+    files_bg_noise_masks[:5],
+)
+
+
 def obj_list():
     # could fix this solution with try/except blocks
     PATH_MAIN = args.src
@@ -79,14 +148,6 @@ def obj_list():
         )
         pass
     return obj_dict
-
-
-if args.src:
-    obj_list()
-else:
-    print(
-        "no source directory given. Please use python3 synthetic.py -h to learn more."
-    )
 
 
 def get_img_and_mask(img_path, mask_path):
@@ -396,77 +457,64 @@ def create_bg_with_noise(
 def check_areas(mask_comp, obj_areas, overlap_degree=0.3):
     obj_ids = np.unique(mask_comp).astype(np.uint8)[1:-1]
     masks = mask_comp == obj_ids[:, None, None]
-    
+
     ok = True
-    
+
     if len(np.unique(mask_comp)) != np.max(mask_comp) + 1:
         ok = False
         return ok
-    
+
     for idx, mask in enumerate(masks):
         if np.count_nonzero(mask) / obj_areas[idx] < 1 - overlap_degree:
             ok = False
             break
-            
-    return ok   
 
-def create_composition(img_comp_bg,
-                       max_objs=15,
-                       overlap_degree=0.2,
-                       max_attempts_per_obj=10):
+    return ok
 
+
+def create_composition(
+    img_comp_bg, max_objs=15, overlap_degree=0.2, max_attempts_per_obj=10
+):
     img_comp = img_comp_bg.copy()
     h, w = img_comp.shape[0], img_comp.shape[1]
-    mask_comp = np.zeros((h,w), dtype=np.uint8)
-    
+    mask_comp = np.zeros((h, w), dtype=np.uint8)
+
     obj_areas = []
     labels_comp = []
     num_objs = np.random.randint(max_objs) + 2
-    
+
     i = 1
-    
+
     for _ in range(1, num_objs):
-
         obj_idx = np.random.randint(len(obj_dict)) + 1
-        
-        for _ in range(max_attempts_per_obj):
 
-            imgs_number = len(obj_dict[obj_idx]['images'])
+        for _ in range(max_attempts_per_obj):
+            imgs_number = len(obj_dict[obj_idx]["images"])
             idx = np.random.randint(imgs_number)
-            img_path = obj_dict[obj_idx]['images'][idx]
-            mask_path = obj_dict[obj_idx]['masks'][idx]
+            img_path = obj_dict[obj_idx]["images"][idx]
+            mask_path = obj_dict[obj_idx]["masks"][idx]
             img, mask = get_img_and_mask(img_path, mask_path)
 
             x, y = np.random.randint(w), np.random.randint(h)
-            longest_min = obj_dict[obj_idx]['longest_min']
-            longest_max = obj_dict[obj_idx]['longest_max']
-            img, mask = resize_transform_obj(img,
-                                             mask,
-                                             longest_min,
-                                             longest_max,
-                                             transforms=transforms_obj)
+            longest_min = obj_dict[obj_idx]["longest_min"]
+            longest_max = obj_dict[obj_idx]["longest_max"]
+            img, mask = resize_transform_obj(
+                img, mask, longest_min, longest_max, transforms=transforms_obj
+            )
 
             if i == 1:
-                img_comp, mask_comp, mask_added = add_obj(img_comp,
-                                                          mask_comp,
-                                                          img,
-                                                          mask,
-                                                          x,
-                                                          y,
-                                                          i)
+                img_comp, mask_comp, mask_added = add_obj(
+                    img_comp, mask_comp, img, mask, x, y, i
+                )
                 obj_areas.append(np.count_nonzero(mask_added))
                 labels_comp.append(obj_idx)
                 i += 1
                 break
-            else:        
+            else:
                 img_comp_prev, mask_comp_prev = img_comp.copy(), mask_comp.copy()
-                img_comp, mask_comp, mask_added = add_obj(img_comp,
-                                                          mask_comp,
-                                                          img,
-                                                          mask,
-                                                          x,
-                                                          y,
-                                                          i)
+                img_comp, mask_comp, mask_added = add_obj(
+                    img_comp, mask_comp, img, mask, x, y, i
+                )
                 ok = check_areas(mask_comp, obj_areas, overlap_degree)
                 if ok:
                     obj_areas.append(np.count_nonzero(mask_added))
@@ -474,16 +522,14 @@ def create_composition(img_comp_bg,
                     i += 1
                     break
                 else:
-                    img_comp, mask_comp = img_comp_prev.copy(), mask_comp_prev.copy()        
-        
+                    img_comp, mask_comp = img_comp_prev.copy(), mask_comp_prev.copy()
+
     return img_comp, mask_comp, labels_comp, obj_areas
-
-
 
 
 def create_yolo_annotations(mask_comp, labels_comp):
     comp_w, comp_h = mask_comp.shape[1], mask_comp.shape[0]
-    
+
     obj_ids = np.unique(mask_comp).astype(np.uint8)[1:]
     masks = mask_comp == obj_ids[:, None, None]
 
@@ -500,44 +546,52 @@ def create_yolo_annotations(mask_comp, labels_comp):
         w = xmax - xmin
         h = ymax - ymin
 
-        annotations_yolo.append([labels_comp[i] - 1,
-                                 round(xc/comp_w, 5),
-                                 round(yc/comp_h, 5),
-                                 round(w/comp_w, 5),
-                                 round(h/comp_h, 5)])
+        annotations_yolo.append(
+            [
+                labels_comp[i] - 1,
+                round(xc / comp_w, 5),
+                round(yc / comp_h, 5),
+                round(w / comp_w, 5),
+                round(h / comp_h, 5),
+            ]
+        )
 
     return annotations_yolo
 
-def generate_dataset(imgs_number, folder, split='train'):
+
+def generate_dataset(imgs_number, folder, split="train"):
     time_start = time.time()
     for j in tqdm(range(imgs_number)):
-        img_comp_bg = create_bg_with_noise(files_bg_imgs,
-                                           files_bg_noise_imgs,
-                                           files_bg_noise_masks,
-                                           max_objs_to_add=60)
-        
-        img_comp, mask_comp, labels_comp, _ = create_composition(img_comp_bg,
-                                                                 max_objs=15,
-                                                                 overlap_degree=0.2,
-                                                                 max_attempts_per_obj=10)
+        img_comp_bg = create_bg_with_noise(
+            files_bg_imgs, files_bg_noise_imgs, files_bg_noise_masks, max_objs_to_add=60
+        )
+
+        img_comp, mask_comp, labels_comp, _ = create_composition(
+            img_comp_bg, max_objs=15, overlap_degree=0.2, max_attempts_per_obj=10
+        )
 
         img_comp = cv2.cvtColor(img_comp, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(os.path.join(folder, split, 'images/{}.jpg').format(j), img_comp)
+        cv2.imwrite(os.path.join(folder, split, "images/{}.jpg").format(j), img_comp)
 
         annotations_yolo = create_yolo_annotations(mask_comp, labels_comp)
         for i in range(len(annotations_yolo)):
-            with open(os.path.join(folder, split, 'labels/{}.txt').format(j), "a") as f:
-                f.write(' '.join(str(el) for el in annotations_yolo[i]) + '\n')
-                
+            with open(os.path.join(folder, split, "labels/{}.txt").format(j), "a") as f:
+                f.write(" ".join(str(el) for el in annotations_yolo[i]) + "\n")
+
     time_end = time.time()
     time_total = round(time_end - time_start)
     time_per_img = round((time_end - time_start) / imgs_number, 1)
-    
-    print("Generation of {} synthetic images is completed. It took {} seconds, or {} seconds per image".format(imgs_number, time_total, time_per_img))
-    print("Images are stored in '{}'".format(os.path.join(folder, split, 'images')))
-    print("Annotations are stored in '{}'".format(os.path.join(folder, split, 'labels')))
 
+    print(
+        "Generation of {} synthetic images is completed. It took {} seconds, or {} seconds per image".format(
+            imgs_number, time_total, time_per_img
+        )
+    )
+    print("Images are stored in '{}'".format(os.path.join(folder, split, "images")))
+    print(
+        "Annotations are stored in '{}'".format(os.path.join(folder, split, "labels"))
+    )
 
-#test_mask()
-#test_background()
-#test_transform()
+generate_dataset(1000, folder='dataset', split='train')
+generate_dataset(200, folder='dataset', split='val')
+
