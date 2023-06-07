@@ -19,7 +19,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# need to fix with try/except loop. Include obj_dict[1] background
 if args.src:
     PATH_MAIN = args.src
 else:
@@ -162,10 +161,6 @@ def get_img_and_mask(img_path, mask_path):
 
     return img, mask
 
-
-###NEED TO FIX
-
-
 def test_mask():
     x = obj_list()
     print(x)
@@ -299,8 +294,7 @@ transforms_obj = A.Compose(
 )
 
 
-# Let's look how image and binary mask of a random object can be transformed
-# with help of resize_transform_obj() function
+# test transforms
 def test_transform():
     x = obj_list()
     print("\n \n \n Testing Binary Mask Transformation \n \n \n")
@@ -592,6 +586,36 @@ def generate_dataset(imgs_number, folder, split="train"):
         "Annotations are stored in '{}'".format(os.path.join(folder, split, "labels"))
     )
 
-generate_dataset(1000, folder='dataset', split='train')
-generate_dataset(200, folder='dataset', split='val')
+
+def mkdir():
+    try: 
+        print("\n\n Checking Project Paths\n")
+        home=os.path.abspath(os.getcwd())
+        os.mkdir(dataset)
+        os.chdir(dataset)
+        dir_list=['train', 'test', 'val']
+        sub_dir_list=['images', 'labels']
+        for x in dir_list:
+            os.chdir(x)
+            for x in sub_dir_list:
+                os.mkdir(x)
+            os.chdir(home)
+        print('\n Home Directory: {} '.format(home))
+        print("\n Data For Generation: ", args.src)
+    except:  
+        dataset=os.path.join(home, 'dataset')
+        print('\n Home Directory: {} '.format(home))
+        print("\n Data For Generation: {} ".format(args.src))
+        print("\n Generated Datasets Stored in: {} ".format(dataset))
+        print("\n Test, Train and Val Datasets Stored in: {} ".format(os.listdir(dataset)))
+       
+
+mkdir()
+
+def generate(): 
+    mkdir()
+    generate_dataset(1000, folder='dataset', split='train')
+    generate_dataset(200, folder='dataset', split='val')
+    generate_dataset(100, folder='dataset', split='test')
+
 
