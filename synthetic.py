@@ -8,13 +8,20 @@ import time
 from tqdm import tqdm
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="Generates Synthetic Datasets for YOLO Object Detection.")
 # add optional arguments
 parser.add_argument(
     "-src",
-    "-source_directory",
+    "-src_dir",
     type=os.path.abspath,
     help="the source directory containing your training dataset",
+)
+parser.add_argument(
+    "-n",
+    "-num",
+    type=int,
+    help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
+    default=1000
 )
 args = parser.parse_args()
 
@@ -22,8 +29,9 @@ args = parser.parse_args()
 if args.src:
     PATH_MAIN = args.src
 else:
+    PATH_MAIN = os.path.abspath('data')
     print(
-        "no source directory given. Please use python3 synthetic.py -h to learn more."
+        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more."
     )
 
 
@@ -47,20 +55,7 @@ for k, _ in obj_dict.items():
 
     obj_dict[k]["images"] = files_imgs
     obj_dict[k]["masks"] = files_masks
-    print(f"\nThe first five files from directory the sorted list of images in {folder_name}:",
-                obj_dict[k]["images"][:5],
-            )
-    print(f"\nThe first five files from the sorted list of masks in {folder_name}:",
-                obj_dict[k]["masks"][:5],
-            )
-print(
-    "The first five files from the sorted list of battery images:",
-    obj_dict[1]["images"][:5],
-)
-print(
-    "\nThe first five files from the sorted list of battery masks:",
-    obj_dict[1]["masks"][:5],
-)
+
 
 files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "background")))
 files_bg_imgs = [os.path.join(PATH_MAIN, "background", f) for f in files_bg_imgs]
@@ -73,20 +68,6 @@ files_bg_noise_masks = sorted(os.listdir(os.path.join(PATH_MAIN, "bg_noise", "ma
 files_bg_noise_masks = [
     os.path.join(PATH_MAIN, "bg_noise", "masks", f) for f in files_bg_noise_masks
 ]
-
-print(
-    "\nThe first five files from the sorted list of background images:",
-    files_bg_imgs[:5],
-)
-print(
-    "\nThe first five files from the sorted list of background noise images:",
-    files_bg_noise_imgs[:5],
-)
-print(
-    "\nThe first five files from the sorted list of background noise masks:",
-    files_bg_noise_masks[:5],
-)
-
 
 def obj_list():
     # could fix this solution with try/except blocks
@@ -160,6 +141,7 @@ def get_img_and_mask(img_path, mask_path):
     mask = mask_b.astype(np.uint8)  # This is binary mask
 
     return img, mask
+
 
 def test_mask():
     x = obj_list()
@@ -588,34 +570,62 @@ def generate_dataset(imgs_number, folder, split="train"):
 
 
 def mkdir():
-    try: 
-        print("\n\n Checking Project Paths\n")
-        home=os.path.abspath(os.getcwd())
+    try:
+        print("\n\n Checking Project Paths:")
+        home = os.path.abspath(os.getcwd())
         os.mkdir(dataset)
         os.chdir(dataset)
-        dir_list=['train', 'test', 'val']
-        sub_dir_list=['images', 'labels']
+        dir_list = ["train", "test", "val"]
+        sub_dir_list = ["images", "labels"]
         for x in dir_list:
-            os.chdir(x)
-            for x in sub_dir_list:
-                os.mkdir(x)
-            os.chdir(home)
-        print('\n Home Directory: {} '.format(home))
-        print("\n Data For Generation: ", args.src)
-    except:  
-        dataset=os.path.join(home, 'dataset')
-        print('\n Home Directory: {} '.format(home))
-        print("\n Data For Generation: {} ".format(args.src))
-        print("\n Generated Datasets Stored in: {} ".format(dataset))
-        print("\n Test, Train and Val Datasets Stored in: {} ".format(os.listdir(dataset)))
-       
+            os.mkdir(x)
+        print("\n\t Home Directory: '{}' ".format(home))
+        print("\n\t Data For Generation: '{}'".format(PATH_MAIN))
+    except:
+        dataset = os.path.join(home, "dataset")
+        print("\n\t Home Directory:'{}' ".format(home))
+        print("\n\t Data For Generation: '{}' ".format(PATH_MAIN))
+        print("\n\t Generated Datasets Stored in: '{}' ".format(dataset))
+        print("\n Removing Old Datasets from: {}".format(dataset))
+        total_number=[]
+        for root, dirs, files in os.walk(dataset):
+            for name in tqdm(files): 
+                total_number.append(files)
+                if name.endswith(".jpg"):
+                    selected_files=os.path.join(root, name)
+                    os.remove(selected_files)
+                if name.endswith('.txt'):
+                    selected_files=os.path.join(root,name)
+                    os.remove(selected_files)
+        if len(total_number) == 0: 
+            print("\n Beginning Data Generation\n")
+        else:
+            print("\n{} files were deleted.".format(len(total_number)))
+            print("\n Beginning Data Generation\n")
+        
+                                  
+#to use with generate to create CLI for first input in generate_dataset
+# simple alegrabic equation 
 
-mkdir()
+if args.n <=10:
+    print("At least 10 images are needed for an 80/10/10 dataset. Using the default value of 1000 training images.")
+    training_set=800
+    test_set=100
+    validation_set=100
+else: 
+    total_dataset=args.n
+    test_set=int((.10*total_dataset)//1)
+    validation_set=int((.10*total_dataset)//1)
+    training_set=int((.80*total_dataset)//1)
+    print(f"\n {total_dataset} images and labels will be split into a 80/10/10 training/test/validation set containing: \n {training_set} training images \n {test_set} test images \n {validation_set} validation images.")
+    
 
-def generate(): 
-    mkdir()
-    generate_dataset(1000, folder='dataset', split='train')
-    generate_dataset(200, folder='dataset', split='val')
-    generate_dataset(100, folder='dataset', split='test')
+def generate():
+    mkdir() 
+    generate_dataset(test_set, folder="dataset", split="train")
+    generate_dataset(validation_set, folder="dataset", split="val")
+    generate_dataset(training_set, folder="dataset", split="test")
 
 
+
+generate()
