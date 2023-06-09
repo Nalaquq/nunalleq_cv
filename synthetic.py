@@ -23,6 +23,9 @@ parser.add_argument(
     help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
     default=1000
 )
+parser.add_argument("-min", type=int, help="the minimum size of images produced", default=150)
+# this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
+parser.add_argument("-max", type=int, help="The maximum size of generated images.", default=800)
 args = parser.parse_args()
 
 
@@ -36,10 +39,10 @@ else:
 
 
 obj_dict = {
-    1: {"folder": "caveg", "longest_min": 150, "longest_max": 800},
-    2: {"folder": "endblades", "longest_min": 150, "longest_max": 800},
-    3: {"folder": "tops", "longest_min": 150, "longest_max": 800},
-    4: {"folder": "ulus", "longest_min": 150, "longest_max": 800},
+    1: {"folder": "caveg", "longest_min": args.min, "longest_max": args.max},
+    2: {"folder": "endblades", "longest_min": args.min, "longest_max": args.max},
+    3: {"folder": "tops", "longest_min": args.min, "longest_max": args.max},
+    4: {"folder": "ulus", "longest_min": args.min, "longest_max": args.max},
 }
 
 for k, _ in obj_dict.items():

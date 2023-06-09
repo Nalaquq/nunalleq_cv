@@ -1,7 +1,8 @@
-1. Create Additional CLI Arguments to control Image Overlap for synthetic.py
-3. Create log.txt Logfile for each run of synthetic.py
-4. Wrap Dictionary Comprehension and Variables in synthetic.py into def and pass
-5. Create Chroma.key workflow for images in chroma.py
-6. Create Updated Readme
-7. Save Adobe photoshop actions as files and upload to github
++ Create Additional CLI Arguments to control Image Overlap for synthetic.py
++ Create log.txt Logfile for each run of synthetic.py
++ Wrap Dictionary Comprehension and Variables in synthetic.py into def and pass
++ Create Chroma.key workflow for images in chroma.py
++ Create Updated Readme
++ Save Adobe photoshop actions as files and upload to github
++ Program crashes when max value is larger than max values of background. Fix this. 
  
