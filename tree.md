@@ -2,7 +2,7 @@
 ├── LICENSE
 ├── TODO.txt
 ├── chroma.py
-├── crop.py
+├── chroma.py:Zone.Identifier
 ├── data
 │   ├── background
 │   │   ├── h_00168a88.jpg
@@ -5255,12 +5255,28 @@
 ├── runs
 │   └── detect
 │       ├── predict
+│       │   ├── 001_caveg.jpg
+│       │   ├── 003_ulu.jpg
+│       │   ├── 006_top.jpg
+│       │   ├── 010_endblade.jpg
+│       │   ├── 021_endblade.jpg
+│       │   ├── 042_endblade.jpg
+│       │   ├── 045_endblade.jpg
 │       │   └── ulu.jpg
 │       ├── predict2
-│       │   └── ulu.jpg
-│       ├── predict3
+│       │   ├── 001_caveg.jpg
+│       │   ├── 003_ulu.jpg
+│       │   ├── 006_top.jpg
+│       │   ├── 010_endblade.jpg
+│       │   ├── 021_endblade.jpg
+│       │   ├── 042_endblade.jpg
+│       │   └── 045_endblade.jpg
+│       ├── predict6
 │       │   └── 001_caveg.jpg
-│       ├── predict4
+│       ├── predict7
+│       │   └── ulu.jpg
+│       ├── predict8
+│       │   └── ulu.jpg
 │       ├── train
 │       │   ├── F1_curve.png
 │       │   ├── PR_curve.png
@@ -5303,12 +5319,17 @@
 ├── tree.md
 ├── venv.sh
 └── yolov8
-    ├── 001_caveg.jpg
     ├── best.pt
+    ├── detect
+    │   ├── 001_caveg.jpg
+    │   ├── 003_ulu.jpg
+    │   ├── 006_top.jpg
+    │   ├── 010_endblade.jpg
+    │   ├── 021_endblade.jpg
+    │   ├── 042_endblade.jpg
+    │   └── 045_endblade.jpg
     ├── nunalleq.yaml
-    ├── ulu.jpg
-    ├── ulu.jpg:Zone.Identifier
     ├── yolov8.py
     └── yolov8n.pt
 
-37 directories, 5274 files
+39 directories, 5293 files
