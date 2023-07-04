@@ -1,5 +1,9 @@
+.venv
+.vscode
 venv/
 data/
 dataset/
 runs/
 yolov8/detect/
+noise/
+*.zip
