@@ -23,9 +23,9 @@ parser.add_argument(
     help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
     default=1000
 )
-parser.add_argument("-min", type=int, help="the minimum size of images produced", default=150)
+parser.add_argument("-min", type=int, help="the minimum size of images produced. The default is 150px.", default=150)
 # this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
-parser.add_argument("-max", type=int, help="The maximum size of generated images.", default=800)
+parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
 args = parser.parse_args()
 
 
