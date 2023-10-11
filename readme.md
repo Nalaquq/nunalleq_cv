@@ -1,7 +1,9 @@
 # The Nunalleq Computer Vision Project
 
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg) [![PyPI status](https://img.shields.io/pypi/status/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [PyPI status](https://img.shields.io/pypi/status/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+
+## Project History and Background
 
 
 
@@ -34,5 +36,5 @@
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white) ![Vim](https://img.shields.io/badge/VIM-%2311AB00.svg?style=for-the-badge&logo=vim&logoColor=white)
 
 # Tutorials and Other Content
-1. An in-depth .ipynb tutorial based on an 2023 independent study between Dr. Sean Gleason and Seth Spickard can be found [here] (https://colab.research.google.com/drive/1xbq9rEOtyQh8QUQU-__E-Ub3Wy3X1NoV). This resource covers the project aims as well as the development of chroma.py and synthetic.p.
+1. An in-depth .ipynb tutorial based on an 2023 independent study between Dr. Sean Gleason and Seth Spickard can be found [here](https://colab.research.google.com/drive/1xbq9rEOtyQh8QUQU-__E-Ub3Wy3X1NoV). This resource covers the project aims as well as the development of chroma.py and synthetic.p.
 
