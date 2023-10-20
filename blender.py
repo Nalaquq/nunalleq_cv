@@ -54,14 +54,35 @@ print(list(bpy.data.objects))
 
 # Renders a .png of the file 
 '''still need to make the colors correct (white background & black mask'''
-
-bpy.data.objects["Uluaq_12147"].select_set(True)
+
+#enables a white background for .png file
+
+'''having trouble here. based on youtube tutorial @ https://www.youtube.com/watch?v=aegiN7XeLow 
+will need to trouble shoot context issue which appears in line 66'''
+
+x=bpy.context.use_nodes
+print(str(x))
+bpy.context.scene.render.film_transparent = True
+bpy.context.scene.view_settings.view_transform = 'Standard'
+bpy.context.scene.use_nodes = True
+#bpy.ops.object.select_all(action="SELECT")
+
+x=bpy.context.selected_objects
+print(str(x))
+#bpy.ops.node.add_node(use_transform=True, type="CompositorNodeAlphaOver")
+
+
 
 #this line creates a mask of the object
+
+bpy.data.objects["Uluaq_12147"].select_set(True)
+
 bpy.context.object.is_holdout=True
 
 bpy.ops.object.select_all(action='SELECT')
 bpy.context.scene.render.filepath = "test.png"
 bpy.ops.render.render(write_still = True)
+
+
 
 
