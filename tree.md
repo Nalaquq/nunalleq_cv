@@ -850,7 +850,6 @@
 ├── LICENSE
 ├── TODO.txt
 ├── Uluaq_12147.glb
-├── Uluaq_12147.glb:Zone.Identifier
 ├── blender.py
 ├── chroma.py
 ├── data
@@ -3522,7 +3521,9 @@
 │           ├── val_batch2_labels.jpg
 │           └── val_batch2_pred.jpg
 ├── synthetic.py
+├── test.png
 ├── test.py
+├── test{x}.png
 ├── tree.md
 ├── venv.sh
 └── yolov8
@@ -3560,4 +3561,4 @@
     ├── yolov8.py
     └── yolov8n.pt
 
-251 directories, 3309 files
+251 directories, 3310 files
