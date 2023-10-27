@@ -114,6 +114,19 @@ cam_rot = bpy.data.objects["Camera"].rotation_euler
 
 print(cam_rot)
 
+
+world = bpy.data.worlds['World']
+world.use_nodes = True
+
+
+#bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
+bpy.context.scene.view_settings.view_transform = 'Standard'
+bg = world.node_tree.nodes['Background']
+bg.inputs[0].default_value = (1, 1, 1, 1)
+bg.inputs[1].default_value = 1.0
+
+
+
 # Renders a .png of the file
 """still need to make the colors correct (white background & black mask"""
 
