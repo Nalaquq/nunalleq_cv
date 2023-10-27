@@ -3523,7 +3523,6 @@
 ├── synthetic.py
 ├── test.png
 ├── test.py
-├── test{x}.png
 ├── tree.md
 ├── venv.sh
 └── yolov8
@@ -3561,4 +3560,4 @@
     ├── yolov8.py
     └── yolov8n.pt
 
-251 directories, 3310 files
+251 directories, 3309 files

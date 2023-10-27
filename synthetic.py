@@ -84,7 +84,7 @@ def obj_list():
                 "longest_min": 150,
                 "longest_max": 800,
             }
-        # delete the "baclkground images" since it does not have the same directory structure
+        # delete the "background images" since it does not have the same directory structure
         del obj_dict[1]
         print(obj_dict)
     except:

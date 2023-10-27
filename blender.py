@@ -1,4 +1,6 @@
 import bpy
+import os
+
 
 # import one of Alice's cool 3d files
 """eventually this needs to be recompiled as an iterative function that takes the file name of the .glb file, imports it, and selects it for editing"""
@@ -75,7 +77,42 @@ def delete_cube():
 delete_cube()
 
 
-print(list(bpy.data.objects))
+def light_aug():
+    """this function augments the position of the light source. The location and light intensity could be randomized"""
+    # Delete old light
+    bpy.ops.object.select_by_type(type="LIGHT")
+    bpy.ops.object.delete(use_global=False)
+
+    view_layer = bpy.context.view_layer
+
+    # Create new light datablock.
+    light_data = bpy.data.lights.new(name="New Light", type="POINT")
+    light_data.energy = 10000
+
+    # Create new object with our light datablock.
+    light_object = bpy.data.objects.new(name="New Light", object_data=light_data)
+
+    # Link light object to the active collection of current view layer,
+    # so that it'll appear in the current scene.
+    view_layer.active_layer_collection.collection.objects.link(light_object)
+
+    # Place light to a specified location.
+    light_object.location = (7.68889, -6.78579, 4.08386)
+    light_object.rotation_euler = (-0.29215, 15.3403, -0.555648)
+
+    # And finally select it and make it active.
+    light_object.select_set(True)
+    view_layer.objects.active = light_object
+    # Sets the location of the light so that object is illuminated
+    print(list(bpy.data.objects))
+
+
+light_aug()
+
+cam_loc = bpy.data.objects["Camera"].location
+cam_rot = bpy.data.objects["Camera"].rotation_euler
+
+print(cam_rot)
 
 # Renders a .png of the file
 """still need to make the colors correct (white background & black mask"""
@@ -99,12 +136,22 @@ print(str(x))
 """
 
 
-# this line creates a mask of the object
+# render a png of image
+def render_obj(path):
+    """this takes the path e.g., Uluaq_12147" as an argument"""
+    bpy.data.objects[path].select_set(True)
+    bpy.context.scene.render.filepath = "test.png"
+    bpy.ops.render.render(write_still=True)
 
-bpy.data.objects["Uluaq_12147"].select_set(True)
 
-bpy.context.object.is_holdout = True
+render_obj("Uluaq_12147")
 
-bpy.ops.object.select_all(action="SELECT")
-bpy.context.scene.render.filepath = "test.png"
-bpy.ops.render.render(write_still=True)
+
+# render a mask of the image
+def render_maske(path):
+    '''renders a mask of the image. Takes a path from blender as an argument e.g, "Uluaq_12147"'''
+    bpy.data.objects[path].select_set(True)
+    bpy.context.object.is_holdout = True
+    bpy.ops.object.select_all(action="SELECT")
+    bpy.context.scene.render.filepath = "mask.png"
+    bpy.ops.render.render(write_still=True)
