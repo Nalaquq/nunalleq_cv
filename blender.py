@@ -10,6 +10,8 @@ bpy.ops.import_scene.gltf(
     files=[{"name": "Uluaq_12147.glb", "name": "Uluaq_12147.glb"}],
     loglevel=50,
 )
+
+
 bpy.ops.object.shade_smooth()
 
 bpy.data.objects["Uluaq_12147"].select_set(True)
@@ -114,57 +116,71 @@ cam_rot = bpy.data.objects["Camera"].rotation_euler
 
 print(cam_rot)
 
-
-world = bpy.data.worlds['World']
-world.use_nodes = True
-
-
-#bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
-bpy.context.scene.view_settings.view_transform = 'Standard'
-bg = world.node_tree.nodes['Background']
-bg.inputs[0].default_value = (1, 1, 1, 1)
-bg.inputs[1].default_value = 1.0
-
-
-
-# Renders a .png of the file
-"""still need to make the colors correct (white background & black mask"""
-
-
-"""
-#enables a white background for .png file
-having trouble here. based on youtube tutorial @ https://www.youtube.com/watch?v=aegiN7XeLow 
-will need to trouble shoot context issue which appears in line 66
-
-x=bpy.context.use_nodes
-print(str(x))
-bpy.context.scene.render.film_transparent = True
-bpy.context.scene.view_settings.view_transform = 'Standard'
-bpy.context.scene.use_nodes = True
-#bpy.ops.object.select_all(action="SELECT")
-
-x=bpy.context.selected_objects
-print(str(x))
-#bpy.ops.node.add_node(use_transform=True, type="CompositorNodeAlphaOver")
-"""
-
-
 # render a png of image
 def render_obj(path):
     """this takes the path e.g., Uluaq_12147" as an argument"""
+    #changes the background to white
+    world = bpy.data.worlds['World']
+    world.use_nodes = True
+    #bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
+    bpy.context.scene.view_settings.view_transform = 'Standard'
+    bg = world.node_tree.nodes['Background']
+    bg.inputs[0].default_value = (1, 1, 1, 1)
+    bg.inputs[1].default_value = 1.0
     bpy.data.objects[path].select_set(True)
     bpy.context.scene.render.filepath = "test.png"
+    bpy.ops.render.render(write_still=True)
+    #change object color to black for mask
+    bpy.ops.object.shade_smooth()
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.data.objects[path].select_set(True)
+    for area in bpy.context.screen.areas:
+        if area.type == "VIEW_3D":
+            for space in area.spaces:
+                if space.type == "VIEW_3D":
+                    space.shading.type = "MATERIAL"
+    #change active object to path (e.g., "Uluaq1214")
+    ob=bpy.context.view_layer.objects.active
+    ob=bpy.data.objects[path]
+    mat = bpy.data.materials.new(name="mask")
+    mat.use_nodes=True
+    ''''need to make the black solid--like a mask. Right now it is not.'''
+    mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0, 0, 0, 0)
+    ob.data.materials.append(mat)
+    ob.active_material = mat
+    print(list(ob.data.materials.items()))
+    print(list(ob.material_slots))
+    bpy.context.collection.objects.link(ob)
+    bpy.context.scene.render.filepath="mask.png"
     bpy.ops.render.render(write_still=True)
 
 
 render_obj("Uluaq_12147")
 
+bpy.ops.object.select_all(action='DESELECT')
+
 
 # render a mask of the image
-def render_maske(path):
+
+def render_mask(path):
     '''renders a mask of the image. Takes a path from blender as an argument e.g, "Uluaq_12147"'''
+   
+    bpy.ops.object.select_all(action='DESELECT')
+    obj = bpy.context.scene.objects[path]
     bpy.data.objects[path].select_set(True)
     bpy.context.object.is_holdout = True
-    bpy.ops.object.select_all(action="SELECT")
+    print(str(bpy.context.object))
+    #changes the background to white
+    #world = bpy.data.worlds['World']
+    #world.use_nodes = True
+    #bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
+    #bpy.context.scene.view_settings.view_transform = 'Standard'
+    #bg = world.node_tree.nodes['Background']
+    #bg.inputs[0].default_value = (1, 1, 1, 1)
+    #bg.inputs[1].default_value = 1.0
     bpy.context.scene.render.filepath = "mask.png"
     bpy.ops.render.render(write_still=True)
+
+
+#render_mask("Uluaq_12147")
+
