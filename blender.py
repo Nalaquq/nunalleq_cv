@@ -79,7 +79,7 @@ def delete_cube():
 delete_cube()
 
 
-def light_aug():
+def light_aug(intensity):
     """this function augments the position of the light source. The location and light intensity could be randomized"""
     # Delete old light
     bpy.ops.object.select_by_type(type="LIGHT")
@@ -89,7 +89,8 @@ def light_aug():
 
     # Create new light datablock.
     light_data = bpy.data.lights.new(name="New Light", type="POINT")
-    light_data.energy = 10000
+    light_data.energy = float(intensity)
+    print(str(light_data.energy))
 
     # Create new object with our light datablock.
     light_object = bpy.data.objects.new(name="New Light", object_data=light_data)
@@ -109,7 +110,7 @@ def light_aug():
     print(list(bpy.data.objects))
 
 
-light_aug()
+light_aug(10000)
 
 cam_loc = bpy.data.objects["Camera"].location
 cam_rot = bpy.data.objects["Camera"].rotation_euler
@@ -139,18 +140,18 @@ def render_obj(path):
             for space in area.spaces:
                 if space.type == "VIEW_3D":
                     space.shading.type = "MATERIAL"
-    #change active object to path (e.g., "Uluaq1214")
-    ob=bpy.context.view_layer.objects.active
-    ob=bpy.data.objects[path]
-    mat = bpy.data.materials.new(name="mask")
-    mat.use_nodes=True
-    ''''need to make the black solid--like a mask. Right now it is not.'''
-    mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0, 0, 0, 0)
-    ob.data.materials.append(mat)
-    ob.active_material = mat
-    print(list(ob.data.materials.items()))
-    print(list(ob.material_slots))
-    bpy.context.collection.objects.link(ob)
+    #creates a black mask of object as well 
+    led = bpy.data.objects[path]
+    led.animation_data_clear()
+    print(str(bpy.data.materials[2]))
+    led_mat = bpy.data.materials[2]
+    led_mat.use_nodes = True
+    tree = led_mat.node_tree
+    nodes = tree.nodes
+    led_emit = nodes.new("ShaderNodeEmission")
+    led_emit.inputs["Color"].default_value = (0, 0, 0, 1)
+    led_emit.inputs["Color"].keyframe_insert("default_value", frame=1)
+    new_link = tree.links.new(nodes['Material Output'].inputs['Surface'], nodes['Emission'].outputs['Emission'])
     bpy.context.scene.render.filepath="mask.png"
     bpy.ops.render.render(write_still=True)
 
