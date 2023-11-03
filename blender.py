@@ -48,10 +48,6 @@ def splitter(path):
     x = os.path.splitext(path)[0]
     print(x)
 
-
-for x in os.listdir("3d_glbs/uluaq"):
-    splitter(x)
-
 #import 3d files and select object in blender with material shading
 def import_object(path):
     '''imports 3d .glb files and selects the imported object in blender'''
@@ -207,11 +203,31 @@ def render_obj(obj):
     bpy.ops.render.render(write_still=True)
 
 def mk_dir():
-    home="os.
+    home=os.getcwd()
+    ulus="data/ulus"
+    ulu_images="data/ulus/images"
+    ulu_masks="data/ulus/masks"
+    objects=PATH_MAIN
+    objects_class=[]
+    #gets a list of the differet sub directories containing 3d objects in 3d_glbs directory
+    for x in os.listdir(objects):
+        objects_class.append(x)
+    #goes through each directory in 3d_glbs and iterates the synthetic generation
+    for x in objects_class:
+        os.chdir(home)
+        os.chdir(objects)
 
-import_object("Uluaq_12147.glb")
-resize("Uluaq_12147")
-rotate("Uluaq_12147")
-delete_cube()
-light_aug(10000)
-render_obj("Uluaq_12147")
+    
+    
+
+mk_dir()
+
+def init_it():
+    import_object("Uluaq_12147.glb")
+    resize("Uluaq_12147")
+    rotate("Uluaq_12147")
+    delete_cube()
+    light_aug(10000)
+    render_obj("Uluaq_12147")
+
+
