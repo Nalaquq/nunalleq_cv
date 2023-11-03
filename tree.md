@@ -1,4 +1,24 @@
 .
+├── 3d_glbs
+│   └── uluaq
+│       ├── Seal_Uluaq_27906.glb
+│       ├── Small_Uluaq_27747.glb
+│       ├── Small_Uluaq_76594.glb
+│       ├── Small_Uluaq_76598.glb
+│       ├── Small_Uluaq_77866.glb
+│       ├── Uluaq_12147.glb
+│       ├── Uluaq_21182.glb
+│       ├── Uluaq_21239.glb
+│       ├── Uluaq_25215.glb
+│       ├── Uluaq_25216.glb
+│       ├── Uluaq_27858.glb
+│       ├── Uluaq_27859.glb
+│       ├── Uluaq_75341.glb
+│       ├── Uluaq_76593.glb
+│       ├── Uluaq_76656.glb
+│       ├── Uluaq_76702.glb
+│       ├── Uluaq_Handle_with_Ivory_Insets_75337.glb
+│       └── Uluaq_with_Inlays_27926.glb
 ├── BlenderProc
 │   ├── CITATION.cff
 │   ├── CLA_entities.pdf
@@ -4119,4 +4139,4 @@
     ├── yolov8.py
     └── yolov8n.pt
 
-252 directories, 3867 files
+254 directories, 3885 files

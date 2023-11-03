@@ -4,8 +4,6 @@ import random
 import os
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
-import albumentations as A
 import time
 from tqdm import tqdm
 
@@ -22,26 +20,34 @@ parser.add_argument(
     "-n",
     "-num",
     type=int,
-    help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
+    help="The number of images to be generated per 3d model. Images angles on the x,y,z plane will be generated randomly",
     default=1000
 )
-parser.add_argument("-min", type=int, help="the minimum size of images produced. The default is 150px.", default=150)
-# this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
-parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
+parser.add_argument("-size", type=int, help="the size of of object synthetically generated in pixels. Objects will be scaled accoridingly. The default is 1500px.", default=1500)
+
 args = parser.parse_args()
 
 
 if args.src:
     PATH_MAIN = args.src
 else:
-    PATH_MAIN = os.path.abspath('data')
+    PATH_MAIN = os.path.abspath('3d_glbs')
     print(
-        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more."
+        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 blender.py -h to learn more."
     )
 
 
 
 # import one of Alice's cool 3d files
+
+def splitter(path):
+    x=os.path.splitext(path)[0]
+    print(x)
+
+for x in os.listdir('3d_glbs/uluaq'):
+    splitter(x)
+
+#splitter("Uluaq_12147.glb")
 
 """eventually this needs to be recompiled as an iterative function that takes the file name of the .glb file, imports it, and selects it for editing"""
 
@@ -72,9 +78,10 @@ def resize(path):
         0
     ]  # produces a vector of object size in X,Y,Z Format. We are only taking the measurement for x since we will scale the o   bject by height
     pixels = meters * px
-    x_height = 1500  # might want to change this
-    scale_size = x_height // pixels
-    print(
+    try:
+        x_height = args.size  # might want to change this
+        scale_size = x_height // pixels
+        print(
         "\n The selected model size is:",
         str(meters),
         "meters",
@@ -82,8 +89,9 @@ def resize(path):
         str(pixels),
         "pixels",
         "\n The selected model will be scaled by a factor of:",
-        str(scale_size),
-    )
+        str(scale_size),)
+    except: 
+        scale_size=1500
     bpy.ops.transform.resize(
         value=(scale_size, scale_size, scale_size),
         orient_type="GLOBAL",
