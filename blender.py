@@ -51,16 +51,18 @@ for x in os.listdir('3d_glbs/uluaq'):
 
 """eventually this needs to be recompiled as an iterative function that takes the file name of the .glb file, imports it, and selects it for editing"""
 
-bpy.ops.import_scene.gltf(
-    filepath="Uluaq_12147.glb",
-    files=[{"name": "Uluaq_12147.glb", "name": "Uluaq_12147.glb"}],
-    loglevel=50,
+def import_object(path):
+    bpy.ops.import_scene.gltf(
+        filepath=path,
+        files=[{"name": path, "name": path}],
+        loglevel=50,
 )
+    bpy.ops.object.shade_smooth()
+    obj=os.path.splitext(path)[0]
+    bpy.data.objects[obj].select_set(True)
 
 
-bpy.ops.object.shade_smooth()
-
-bpy.data.objects["Uluaq_12147"].select_set(True)
+import_object("Uluaq_12147.glb")
 
 # Shades objects (show's 3D model color)
 for area in bpy.context.screen.areas:
