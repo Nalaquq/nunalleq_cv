@@ -216,7 +216,9 @@ def mk_dir():
     for x in objects_class:
         os.chdir(home)
         os.chdir(objects)
-
+        os.chdir(x)
+        for x in os.listdir():
+            print(x)
     
     
 
