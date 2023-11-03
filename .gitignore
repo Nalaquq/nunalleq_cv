@@ -4,3 +4,4 @@ dataset/
 runs/
 yolov8/detect/
 BlenderProc/
+3d_glbs/

@@ -14,7 +14,7 @@ parser.add_argument(
     "-src",
     "-src_dir",
     type=os.path.abspath,
-    help="the source directory containing your training dataset",
+    help="the source directory containing your data for generation",
 )
 parser.add_argument(
     "-n",

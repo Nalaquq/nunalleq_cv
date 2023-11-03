@@ -1,9 +1,48 @@
 import bpy
 import os
 import random
+import os
+import argparse
+import numpy as np
+import matplotlib.pyplot as plt
+import albumentations as A
+import time
+from tqdm import tqdm
+
+
+parser = argparse.ArgumentParser(description="A Blender tool for generating synthetic datasets for object detection using 3d assets")
+# add optional arguments
+parser.add_argument(
+    "-src",
+    "-src_dir",
+    type=os.path.abspath,
+    help="the source directory containing your data for generation",
+)
+parser.add_argument(
+    "-n",
+    "-num",
+    type=int,
+    help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
+    default=1000
+)
+parser.add_argument("-min", type=int, help="the minimum size of images produced. The default is 150px.", default=150)
+# this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
+parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
+args = parser.parse_args()
+
+
+if args.src:
+    PATH_MAIN = args.src
+else:
+    PATH_MAIN = os.path.abspath('data')
+    print(
+        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more."
+    )
+
 
 
 # import one of Alice's cool 3d files
+
 """eventually this needs to be recompiled as an iterative function that takes the file name of the .glb file, imports it, and selects it for editing"""
 
 bpy.ops.import_scene.gltf(
@@ -165,31 +204,4 @@ def render_obj(path):
 
 
 render_obj("Uluaq_12147")
-
-bpy.ops.object.select_all(action='DESELECT')
-
-
-# render a mask of the image
-
-def render_mask(path):
-    '''renders a mask of the image. Takes a path from blender as an argument e.g, "Uluaq_12147"'''
-   
-    bpy.ops.object.select_all(action='DESELECT')
-    obj = bpy.context.scene.objects[path]
-    bpy.data.objects[path].select_set(True)
-    bpy.context.object.is_holdout = True
-    print(str(bpy.context.object))
-    #changes the background to white
-    #world = bpy.data.worlds['World']
-    #world.use_nodes = True
-    #bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
-    #bpy.context.scene.view_settings.view_transform = 'Standard'
-    #bg = world.node_tree.nodes['Background']
-    #bg.inputs[0].default_value = (1, 1, 1, 1)
-    #bg.inputs[1].default_value = 1.0
-    bpy.context.scene.render.filepath = "mask.png"
-    bpy.ops.render.render(write_still=True)
-
-
-#render_mask("Uluaq_12147")
 
