@@ -7,8 +7,10 @@ import numpy as np
 import time
 from tqdm import tqdm
 
-
-parser = argparse.ArgumentParser(description="A Blender tool for generating synthetic datasets for object detection using 3d assets")
+# Create CLI for tool with arg.parse
+parser = argparse.ArgumentParser(
+    description="A Blender tool for generating synthetic datasets for object detection using 3d assets"
+)
 # add optional arguments
 parser.add_argument(
     "-src",
@@ -21,61 +23,60 @@ parser.add_argument(
     "-num",
     type=int,
     help="The number of images to be generated per 3d model. Images angles on the x,y,z plane will be generated randomly",
-    default=1000
+    default=1000,
 )
-parser.add_argument("-size", type=int, help="the size of of object synthetically generated in pixels. Objects will be scaled accoridingly. The default is 1500px.", default=1500)
+parser.add_argument(
+    "-size",
+    type=int,
+    help="the size of of object synthetically generated in pixels. Objects will be scaled accoridingly. The default is 1500px.",
+    default=1500,
+)
 
 args = parser.parse_args()
 
-
+#init the arguments 
 if args.src:
     PATH_MAIN = args.src
 else:
-    PATH_MAIN = os.path.abspath('3d_glbs')
+    PATH_MAIN = os.path.abspath("3d_glbs")
     print(
         f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 blender.py -h to learn more."
     )
 
 
-
-# import one of Alice's cool 3d files
-
 def splitter(path):
-    x=os.path.splitext(path)[0]
+    x = os.path.splitext(path)[0]
     print(x)
 
-for x in os.listdir('3d_glbs/uluaq'):
+
+for x in os.listdir("3d_glbs/uluaq"):
     splitter(x)
 
-#splitter("Uluaq_12147.glb")
-
-"""eventually this needs to be recompiled as an iterative function that takes the file name of the .glb file, imports it, and selects it for editing"""
-
+#import 3d files and select object in blender with material shading
 def import_object(path):
+    '''imports 3d .glb files and selects the imported object in blender'''
     bpy.ops.import_scene.gltf(
         filepath=path,
         files=[{"name": path, "name": path}],
         loglevel=50,
-)
+    )
     bpy.ops.object.shade_smooth()
-    obj=os.path.splitext(path)[0]
+    # removes the extension of filename for Blender import
+    obj = os.path.splitext(path)[0]
     bpy.data.objects[obj].select_set(True)
+    # Shades objects (show's 3D model color)
+    for area in bpy.context.screen.areas:
+        if area.type == "VIEW_3D":
+            for space in area.spaces:
+                if space.type == "VIEW_3D":
+                    space.shading.type = "MATERIAL"
 
 
-import_object("Uluaq_12147.glb")
-
-# Shades objects (show's 3D model color)
-for area in bpy.context.screen.areas:
-    if area.type == "VIEW_3D":
-        for space in area.spaces:
-            if space.type == "VIEW_3D":
-                space.shading.type = "MATERIAL"
-
-
-def resize(path):
+#resize the imported object using a scale factor based on pixel size 
+def resize(obj):
     """this function takes the object name and resizes it. The relative size of the transformation should be calculated in pixels if possible to ensure that it does not conflict with syntehtic.py. Blender calculates relative size in meters, but our YOLO classifier will deal in pixels. Thus the resizer is based on a scaled x-height of 1500 pixels"""
     px = 377.9527559055  # one meter is 377.95 pixels
-    bpy.data.objects[path].select_set(True)
+    bpy.data.objects[obj].select_set(True)
     meters = bpy.context.object.dimensions[
         0
     ]  # produces a vector of object size in X,Y,Z Format. We are only taking the measurement for x since we will scale the o   bject by height
@@ -84,16 +85,17 @@ def resize(path):
         x_height = args.size  # might want to change this
         scale_size = x_height // pixels
         print(
-        "\n The selected model size is:",
-        str(meters),
-        "meters",
-        "\n This translates to",
-        str(pixels),
-        "pixels",
-        "\n The selected model will be scaled by a factor of:",
-        str(scale_size),)
-    except: 
-        scale_size=1500
+            "\n The selected model size is:",
+            str(meters),
+            "meters",
+            "\n This translates to",
+            str(pixels),
+            "pixels",
+            "\n The selected model will be scaled by a factor of:",
+            str(scale_size),
+        )
+    except:
+        scale_size = 1500
     bpy.ops.transform.resize(
         value=(scale_size, scale_size, scale_size),
         orient_type="GLOBAL",
@@ -116,24 +118,18 @@ def resize(path):
     )
 
 
-resize("Uluaq_12147")
-
-def rotate(path):
-    r=random.uniform(0,360)
+def rotate(obj):
+    r = random.uniform(0, 360)
     bpy.ops.object.select_all(action="DESELECT")
-    bpy.data.objects[path].select_set(True)
+    bpy.data.objects[obj].select_set(True)
     bpy.ops.transform.rotate(value=r)
 
-rotate("Uluaq_12147")
 
 def delete_cube():
     """deletes the cube that is autogenerated by Blender"""
     bpy.ops.object.select_all(action="DESELECT")
     bpy.data.objects["Cube"].select_set(True)
     bpy.ops.object.delete(use_global=False, confirm=False)
-
-
-delete_cube()
 
 
 def light_aug(intensity):
@@ -167,38 +163,33 @@ def light_aug(intensity):
     print(list(bpy.data.objects))
 
 
-light_aug(10000)
 
-cam_loc = bpy.data.objects["Camera"].location
-cam_rot = bpy.data.objects["Camera"].rotation_euler
-
-print(cam_rot)
 
 # render a png of image
-def render_obj(path):
+def render_obj(obj):
     """this takes the path e.g., Uluaq_12147" as an argument"""
-    #changes the background to white
-    world = bpy.data.worlds['World']
+    # changes the background to white
+    world = bpy.data.worlds["World"]
     world.use_nodes = True
-    #bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
-    bpy.context.scene.view_settings.view_transform = 'Standard'
-    bg = world.node_tree.nodes['Background']
+    # bpy.context.scene.view_settings.view_transform = 'Standard'#bpy.context.scene.render.film_transparent= True
+    bpy.context.scene.view_settings.view_transform = "Standard"
+    bg = world.node_tree.nodes["Background"]
     bg.inputs[0].default_value = (1, 1, 1, 1)
     bg.inputs[1].default_value = 1.0
-    bpy.data.objects[path].select_set(True)
+    bpy.data.objects[obj].select_set(True)
     bpy.context.scene.render.filepath = "test.png"
     bpy.ops.render.render(write_still=True)
-    #change object color to black for mask
+    # change object color to black for mask
     bpy.ops.object.shade_smooth()
-    bpy.ops.object.select_all(action='DESELECT')
-    bpy.data.objects[path].select_set(True)
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.data.objects[obj].select_set(True)
     for area in bpy.context.screen.areas:
         if area.type == "VIEW_3D":
             for space in area.spaces:
                 if space.type == "VIEW_3D":
                     space.shading.type = "MATERIAL"
-    #creates a black mask of object as well 
-    led = bpy.data.objects[path]
+    # creates a black mask of object as well
+    led = bpy.data.objects[obj]
     led.animation_data_clear()
     print(str(bpy.data.materials[2]))
     led_mat = bpy.data.materials[2]
@@ -208,10 +199,19 @@ def render_obj(path):
     led_emit = nodes.new("ShaderNodeEmission")
     led_emit.inputs["Color"].default_value = (0, 0, 0, 1)
     led_emit.inputs["Color"].keyframe_insert("default_value", frame=1)
-    new_link = tree.links.new(nodes['Material Output'].inputs['Surface'], nodes['Emission'].outputs['Emission'])
-    bpy.context.scene.render.filepath="mask.png"
+    new_link = tree.links.new(
+        nodes["Material Output"].inputs["Surface"],
+        nodes["Emission"].outputs["Emission"],
+    )
+    bpy.context.scene.render.filepath = "mask.png"
     bpy.ops.render.render(write_still=True)
 
+def mk_dir():
+    home="os.
 
+import_object("Uluaq_12147.glb")
+resize("Uluaq_12147")
+rotate("Uluaq_12147")
+delete_cube()
+light_aug(10000)
 render_obj("Uluaq_12147")
-
