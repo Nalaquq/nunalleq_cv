@@ -173,7 +173,7 @@ def render_obj(obj):
     bg.inputs[0].default_value = (1, 1, 1, 1)
     bg.inputs[1].default_value = 1.0
     bpy.data.objects[obj].select_set(True)
-    bpy.context.scene.render.filepath = "test.png"
+    bpy.context.scene.render.filepath = obj+".png"
     bpy.ops.render.render(write_still=True)
     # change object color to black for mask
     bpy.ops.object.shade_smooth()
@@ -199,7 +199,7 @@ def render_obj(obj):
         nodes["Material Output"].inputs["Surface"],
         nodes["Emission"].outputs["Emission"],
     )
-    bpy.context.scene.render.filepath = "mask.png"
+    bpy.context.scene.render.filepath = obj+"_mask.png"
     bpy.ops.render.render(write_still=True)
 
 def mk_dir():
@@ -220,9 +220,6 @@ def mk_dir():
         for x in os.listdir():
             print(x)
     
-    
-
-mk_dir()
 
 def init_it():
     import_object("Uluaq_12147.glb")
@@ -232,4 +229,4 @@ def init_it():
     light_aug(10000)
     render_obj("Uluaq_12147")
 
-
+init_it()
