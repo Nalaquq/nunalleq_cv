@@ -2,23 +2,59 @@
 ├── 3d_glbs
 │   └── uluaq
 │       ├── Seal_Uluaq_27906.glb
+│       ├── Seal_Uluaq_27906.png
+│       ├── Seal_Uluaq_27906_mask.png
 │       ├── Small_Uluaq_27747.glb
+│       ├── Small_Uluaq_27747.png
+│       ├── Small_Uluaq_27747_mask.png
 │       ├── Small_Uluaq_76594.glb
+│       ├── Small_Uluaq_76594.png
+│       ├── Small_Uluaq_76594_mask.png
 │       ├── Small_Uluaq_76598.glb
+│       ├── Small_Uluaq_76598.png
+│       ├── Small_Uluaq_76598_mask.png
 │       ├── Small_Uluaq_77866.glb
+│       ├── Small_Uluaq_77866.png
+│       ├── Small_Uluaq_77866_mask.png
 │       ├── Uluaq_12147.glb
+│       ├── Uluaq_12147.png
+│       ├── Uluaq_12147_mask.png
 │       ├── Uluaq_21182.glb
+│       ├── Uluaq_21182.png
+│       ├── Uluaq_21182_mask.png
 │       ├── Uluaq_21239.glb
+│       ├── Uluaq_21239.png
+│       ├── Uluaq_21239_mask.png
 │       ├── Uluaq_25215.glb
+│       ├── Uluaq_25215.png
+│       ├── Uluaq_25215_mask.png
 │       ├── Uluaq_25216.glb
+│       ├── Uluaq_25216.png
+│       ├── Uluaq_25216_mask.png
 │       ├── Uluaq_27858.glb
+│       ├── Uluaq_27858.png
+│       ├── Uluaq_27858_mask.png
 │       ├── Uluaq_27859.glb
+│       ├── Uluaq_27859.png
+│       ├── Uluaq_27859_mask.png
 │       ├── Uluaq_75341.glb
+│       ├── Uluaq_75341.png
+│       ├── Uluaq_75341_mask.png
 │       ├── Uluaq_76593.glb
+│       ├── Uluaq_76593.png
+│       ├── Uluaq_76593_mask.png
 │       ├── Uluaq_76656.glb
+│       ├── Uluaq_76656.png
+│       ├── Uluaq_76656_mask.png
 │       ├── Uluaq_76702.glb
+│       ├── Uluaq_76702.png
+│       ├── Uluaq_76702_mask.png
 │       ├── Uluaq_Handle_with_Ivory_Insets_75337.glb
-│       └── Uluaq_with_Inlays_27926.glb
+│       ├── Uluaq_Handle_with_Ivory_Insets_75337.png
+│       ├── Uluaq_Handle_with_Ivory_Insets_75337_mask.png
+│       ├── Uluaq_with_Inlays_27926.glb
+│       ├── Uluaq_with_Inlays_27926.png
+│       └── Uluaq_with_Inlays_27926_mask.png
 ├── BlenderProc
 │   ├── CITATION.cff
 │   ├── CLA_entities.pdf
@@ -870,6 +906,8 @@
 ├── LICENSE
 ├── TODO.txt
 ├── Uluaq_12147.glb
+├── Uluaq_12147.png
+├── Uluaq_12147_mask.png
 ├── blender.py
 ├── chroma.py
 ├── data
@@ -3885,7 +3923,6 @@
 │       │   ├── 8.txt
 │       │   └── 9.txt
 │       └── labels.cache
-├── mask.png
 ├── readme.md
 ├── requirements.txt
 ├── runs
@@ -4100,7 +4137,6 @@
 │           ├── val_batch2_labels.jpg
 │           └── val_batch2_pred.jpg
 ├── synthetic.py
-├── test.png
 ├── test.py
 ├── tree.md
 ├── venv.sh
@@ -4139,4 +4175,4 @@
     ├── yolov8.py
     └── yolov8n.pt
 
-254 directories, 3885 files
+254 directories, 3921 files
