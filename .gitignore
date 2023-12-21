@@ -5,3 +5,6 @@ runs/
 yolov8/detect/
 BlenderProc/
 3d_glbs/
+blender_images/
+blender_masks/
+Seal_Uluaq_27906.3d_glb
