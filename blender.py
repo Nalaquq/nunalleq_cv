@@ -1,12 +1,16 @@
-import bpy
+import bpy, cycles
 import os
 import random
-import os
 import argparse
 import numpy as np
 import time
 from tqdm import tqdm
 import shutil
+import cv2 as cv
+import PIL.Image
+import shutil
+import gpu
+from datetime import datetime
 
 # Create CLI for tool with arg.parse
 parser = argparse.ArgumentParser(
@@ -24,7 +28,7 @@ parser.add_argument(
     "-num",
     type=int,
     help="The number of images to be generated per 3d model. Images angles on the x,y,z plane will be generated randomly",
-    default=3,
+    default=1,
 )
 parser.add_argument(
     "-size",
@@ -38,11 +42,32 @@ args = parser.parse_args()
 #init the arguments 
 if args.src:
     PATH_MAIN = args.src
+    os.chdir(PATH_MAIN)
 else:
-    PATH_MAIN = os.path.abspath("3d_glbs")
+    PATH_MAIN = os.path.abspath(os.getcwd())
     print(
         f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 blender.py -h to learn more."
     )
+
+'''selects both GPU and CPU for rendering engine
+'''
+#gpu.platform.device_type_get()
+bpy.data.scenes[0].render.engine = "CYCLES"
+
+# Set the device_type
+bpy.context.preferences.addons[
+            "cycles"
+            ].preferences.compute_device_type = "CUDA" # or "OPENCL"
+
+# Set the device and feature set
+bpy.context.scene.cycles.device = "GPU"
+
+# get_devices() to let Blender detects GPU device
+bpy.context.preferences.addons["cycles"].preferences.get_devices()
+print(bpy.context.preferences.addons["cycles"].preferences.compute_device_type)
+for d in bpy.context.preferences.addons["cycles"].preferences.devices:
+    d["use"] = 1 # Using all devices, include GPU and CPU
+    print(d["name"], d["use"])
 
 
 def spliter(path):
@@ -181,6 +206,7 @@ def render_obj(obj, label):
     """this takes the path e.g., Uluaq_12147" as an argument"""
     #need to creeate list of from 0-number. Then iterate through this list and render.
     label=str(label)
+    time=datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     # changes the background to white
     world = bpy.data.worlds["World"]
     world.use_nodes = True
@@ -192,7 +218,7 @@ def render_obj(obj, label):
     bg.inputs[1].default_value = 1.0
     bpy.data.objects[obj].select_set(True)
     bpy.context.scene.render.image_settings.file_format='PNG'  
-    bpy.context.scene.render.filepath = obj+"_"+label+"_image"
+    bpy.context.scene.render.filepath = obj+"_"+label+"_"+time+"_image"
     bpy.context.scene.render.image_settings.color_mode='RGB' 
     bpy.ops.render.render(write_still=True)
     # change object color to black for mask
@@ -223,7 +249,7 @@ def render_obj(obj, label):
         nodes["Emission"].outputs["Emission"],
     )
     bpy.context.scene.render.image_settings.file_format='PNG'
-    bpy.context.scene.render.filepath = obj+"_"+label+"_mask"
+    bpy.context.scene.render.filepath = obj+"_"+label+"_"+time+"_mask"
     bpy.context.scene.render.image_settings.color_mode='RGB'
     bpy.ops.render.render(write_still=True) 
     bpy.data.materials.remove(led_mat)
@@ -261,14 +287,20 @@ def generate(path):
         render_obj(obj, number)
         delete_obj(obj)
 
-source = '/home/nalkuq/nunalleq_cv/'
+source = PATH_MAIN
 destination_images = '/home/nalkuq/nunalleq_cv/blender_images/'
 destination_masks = "/home/nalkuq/nunalleq_cv/blender_masks/"
 
+def iteration():
+    for x in os.listdir():
+        if x.endswith(".glb"):
+            generate(x)
 
-for x in os.listdir():
-    if x.endswith(".glb"):
-        generate(x)
+
+if __name__ == "__main__":
+    iteration()
+
+
 
 for x in os.listdir():
     if x.endswith("mask.png"):
@@ -283,4 +315,52 @@ for x in os.listdir():
         shutil.move(src_path, dst_path)
         os.chdir(source)
 
+source = PATH_MAIN
+destination_images = '/home/nalkuq/nunalleq_cv/blender_images/'
+destination_masks = "/home/nalkuq/nunalleq_cv/blender_masks/"
 
+os.chdir(source)
+
+for x in os.listdir():
+    if x.endswith("mask.png"):
+        print(x)
+        src_path = os.path.join(source, x)
+        dst_path = os.path.join(destination_masks, x)
+        shutil.move(src_path, dst_path)
+        os.chdir(source)
+    if x.endswith("image.png"): 
+        print(x)
+        src_path = os.path.join(source, x)
+        dst_path = os.path.join(destination_images, x)
+        shutil.move(src_path, dst_path)
+        os.chdir(source)
+
+
+os.chdir(destination_masks)
+
+#resets Blender Mask PNG so it works with syntehtic.py
+for x in os.listdir():
+    image=PIL.Image.open(x)
+    rgba=image.convert("RGBA")
+    datas=rgba.getdata()
+    newData=[]
+    for item in datas:
+        if item[0]!=255 and item[1]!=255 and item[2]!=255:
+            newData.append((0,0,0,1))
+        else: 
+            newData.append(item)
+    rgba.putdata(newData)
+    rgba.save(x, "PNG")
+    print(image)
+
+#denoises image to remove black pixels around border of mask and image 
+for x in os.listdir():
+    filename=x
+    img = cv.imread(x, cv.IMREAD_GRAYSCALE)
+    assert img is not None, "file could not be read, check with os.path.exists()"
+    kernel = np.ones((5,5),np.uint8)
+    opening = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
+    cv.imwrite(filename, opening)
+    print(x)
+
+  

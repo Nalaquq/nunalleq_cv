@@ -12,7 +12,7 @@ for i in range(torch.cuda.device_count()):
 model = YOLO('yolov8n.pt')
 
 # Train the model using the 'coco128.yaml' dataset for 3 epochs
-results = model.train(data='nunalleq.yaml', workers=1, epochs=100, imgsz=1024)
+results = model.train(data='nunalleq.yaml', workers=1, epochs=300, imgsz=1024)
 
 # Evaluate the model's performance on the validation set
 results = model.val()

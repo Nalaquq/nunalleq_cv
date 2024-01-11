@@ -4,8 +4,8 @@ test: /home/nalkuq/nunalleq_cv/dataset/test
 val: /home/nalkuq/nunalleq_cv/dataset/val 
 
 #Classes replace with number of classes
-nc: 4
+nc: 1
 
 #classes names
 #replace all class names list with your classes names
-names: ['caveg', 'endblade', 'tops', 'ulus']
+names: ['ulus']

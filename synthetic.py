@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import albumentations as A
 import time
 from tqdm import tqdm
-
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description="Generates Synthetic Datasets for YOLO Object Detection.")
 # add optional arguments
@@ -28,6 +28,7 @@ parser.add_argument("-min", type=int, help="the minimum size of images produced.
 parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
 args = parser.parse_args()
 
+parser.add_argument("-erase", "-erase_existing_dataset", type=bool, help="Boolean value that deletes all files in dataset directory before generation. Default is false, so that labels and images will not be deleted between runs.", default=False)
 
 if args.src:
     PATH_MAIN = args.src
@@ -37,12 +38,11 @@ else:
         f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more."
     )
 
-
 obj_dict = {
-    1: {"folder": "caveg", "longest_min": args.min, "longest_max": args.max},
-    2: {"folder": "endblades", "longest_min": args.min, "longest_max": args.max},
-    3: {"folder": "tops", "longest_min": args.min, "longest_max": args.max},
-    4: {"folder": "ulus", "longest_min": args.min, "longest_max": args.max},
+    #1: {"folder": "caveg", "longest_min": args.min, "longest_max": args.max},
+    #2: {"folder": "endblades", "longest_min": args.min, "longest_max": args.max},
+    #3: {"folder": "tops", "longest_min": args.min, "longest_max": args.max},
+    1: {"folder": "ulus", "longest_min": args.min, "longest_max": args.max},
 }
 
 for k, _ in obj_dict.items():
@@ -540,6 +540,7 @@ def create_yolo_annotations(mask_comp, labels_comp):
 
 def generate_dataset(imgs_number, folder, split="train"):
     time_start = time.time()
+    timing=datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     for j in tqdm(range(imgs_number)):
         img_comp_bg = create_bg_with_noise(
             files_bg_imgs, files_bg_noise_imgs, files_bg_noise_masks, max_objs_to_add=60
@@ -550,13 +551,12 @@ def generate_dataset(imgs_number, folder, split="train"):
         )
 
         img_comp = cv2.cvtColor(img_comp, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(os.path.join(folder, split, "images/{}.jpg").format(j), img_comp)
+        cv2.imwrite(os.path.join(folder, split, "images/{}"+timing+".jpg").format(j), img_comp)
 
         annotations_yolo = create_yolo_annotations(mask_comp, labels_comp)
         for i in range(len(annotations_yolo)):
-            with open(os.path.join(folder, split, "labels/{}.txt").format(j), "a") as f:
+            with open(os.path.join(folder, split, "labels/{}"+timing+".txt").format(j), "a") as f:
                 f.write(" ".join(str(el) for el in annotations_yolo[i]) + "\n")
-
     time_end = time.time()
     time_total = round(time_end - time_start)
     time_per_img = round((time_end - time_start) / imgs_number, 1)
@@ -591,6 +591,7 @@ def mkdir():
         print("\n\t Generated Datasets Stored in: '{}' ".format(dataset))
         print("\n Removing Old Datasets from: {}".format(dataset))
         total_number=[]
+        #insert if statement for argparse libary that runs clean remove existing dataset -del if set to true. Default will be false..   
         for root, dirs, files in os.walk(dataset):
             for name in tqdm(files): 
                 total_number.append(files)
@@ -602,33 +603,38 @@ def mkdir():
                     os.remove(selected_files)
         if len(total_number) == 0: 
             print("\n Beginning Data Generation\n")
-        else:
             print("\n{} files were deleted.".format(len(total_number)))
+        else:
+            print("\n There are {} labels and images in this dataset.".format(len(total_number)))
+            print("\n No files were deleted.")
             print("\n Beginning Data Generation\n")
         
                                   
 #to use with generate to create CLI for first input in generate_dataset
-# simple alegrabic equation 
+# Should wrap this into a function as well.  
+def test_train_val_split():
+    if args.n <=10:
+        print("At least 10 images are needed for an 80/10/10 dataset. Using the default value of 1000 training images.")
+        training_set=800
+        test_set=100
+        validation_set=100
+    else: 
+        total_dataset=args.n
+        test_set=int((.10*total_dataset)//1)
+        validation_set=int((.10*total_dataset)//1)
+        training_set=int((.80*total_dataset)//1)
+        print(f"\n {total_dataset} images and labels will be split into a 80/10/10 training/test/validation set containing: \n {training_set} training images \n {test_set} test images \n {validation_set} validation images.")
+    print(test_set)
+    return test_set, training_set, validation_set
 
-if args.n <=10:
-    print("At least 10 images are needed for an 80/10/10 dataset. Using the default value of 1000 training images.")
-    training_set=800
-    test_set=100
-    validation_set=100
-else: 
-    total_dataset=args.n
-    test_set=int((.10*total_dataset)//1)
-    validation_set=int((.10*total_dataset)//1)
-    training_set=int((.80*total_dataset)//1)
-    print(f"\n {total_dataset} images and labels will be split into a 80/10/10 training/test/validation set containing: \n {training_set} training images \n {test_set} test images \n {validation_set} validation images.")
-    
 
 def generate():
-    mkdir() 
-    generate_dataset(test_set, folder="dataset", split="train")
-    generate_dataset(validation_set, folder="dataset", split="val")
-    generate_dataset(training_set, folder="dataset", split="test")
-
+    mkdir()
+    ttv=test_train_val_split()
+    generate_dataset(ttv[0], folder="dataset", split="test")
+    generate_dataset(ttv[2], folder="dataset", split="val")
+    generate_dataset(ttv[1], folder="dataset", split="train")
 
 
 generate()
+
