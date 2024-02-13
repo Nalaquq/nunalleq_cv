@@ -269,7 +269,7 @@ transforms_obj = A.Compose(
     [
         A.RandomRotate90(p=1),
         A.RandomBrightnessContrast(
-            brightness_limit=(-0.1, 0.2),
+            brightness_limit=(-0.5, 0.2),
             contrast_limit=0.1,
             brightness_by_max=True,
             always_apply=False,
@@ -576,8 +576,11 @@ def mkdir():
     try:
         print("\n\n Checking Project Paths:")
         home = os.path.abspath(os.getcwd())
-        os.mkdir(dataset)
-        os.chdir(dataset)
+        try:
+            os.mkdir(dataset)
+            os.chdir(dataset)
+        except:
+            os.chdir(dataset)
         dir_list = ["train", "test", "val"]
         sub_dir_list = ["images", "labels"]
         for x in dir_list:

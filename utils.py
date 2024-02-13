@@ -1,4 +1,7 @@
-import subprocess 
+import subprocess
+import cv2
+import numpy as np 
+import os
 
 def nvidia_check():
     try: 
@@ -21,9 +24,36 @@ def cuda_enable():
         print("No Cuda support detected. \n Image Processing Pipeline will be run on CPU")
         import numpy as np
 
+def img_erode(path):
+    filepath=path
+    img = cv2.imread(path)
+    assert img is not None, "file could not be read, check with os.path.exists()"
+    #kernel = np.ones((5,5),np.uint8)
+    #erosion = cv2.erode(img,kernel,iterations = 1)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+    erode = cv2.erode(img, kernel, iterations=2)
+    cv2.imwrite(path, erode)
 
-if __name__== "__main__":
-    cuda_enable()
+def img_dialate(path):
+    filepath=path
+    img=cv2.imread(path)
+    assert img is not None, "file could not be read, check with os.path.exists()"
+    kernel=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
+    dilate=cv2.dilate(img, kernel, iterations=2)
+    cv2.imwrite(path, dilate)
+
+def dir_comp(path):
+    home=os.getcwd()
+    os.chdir(path)
+    files=os.listdir()
+    print(files)
+    return files
 
 
+if __name__=="__main__":
+    #mask_erode()
+    files=dir_comp("data/ulus/images")
+    for file in files: 
+        img_erode(file)
+        print(file)
 

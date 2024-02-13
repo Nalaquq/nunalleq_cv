@@ -1,0 +1,1 @@
+ulu_train_img='azureml://subscriptions/67f37f57-7eac-4b1e-8d25-69638a5610b1/resourcegroups/nukalpiaq-rg/workspaces/imls_cv/datastores/workspaceblobstore/paths/UI/2024-01-12_032208_UTC'

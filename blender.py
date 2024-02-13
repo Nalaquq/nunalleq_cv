@@ -141,14 +141,67 @@ def resize(obj):
     )
 
 
-def rotate(obj):
-    r = random.uniform(0, 360)
+
+def select_obj(path):
+    '''deselects all other objects and selects specified path'''
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.data.objects[path].select_set(True)
+
+
+def obj_location(path): 
+    '''takes object as input and returns a numpy array of x,y,z location values. Note: x,y,z values returned correspond the middle of the object'''
+    loc=bpy.data.objects[path].location
+    array=np.array(loc)
+    return array
+
+
+def place_obj(obj, **kwargs):
+    '''places a selected object at specficied x,y,z coordinates in blender'''
+    try: 
+        x=kwargs.get('x', int)
+        y=kwargs.get('y', int)
+        z=kwargs.get('z', int) 
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.data.objects[obj].select_set(True)
+        bpy.context.object.location[2] = z
+        bpy.context.object.rotation_quaternion[1] = 1
+    except:
+        print("Could not place object. Please read documentation.")
+
+def rotateCamera(scene):
+    """Rotate the camera around an object. Takes the scene as parameter from handler."""
+    newTheta = theta*scene.frame_current
+    rotationMatrix = np.array([[math.cos(newTheta),-math.sin(newTheta),0],
+                                [math.sin(newTheta), math.cos(newTheta),0],
+                                [0,0,1]])
+    camera.location = np.dot(cameraOrigin,rotationMatrix) + focusObject.location
+
+
+def track_obj():
+    '''positions the camera to track an object. Must fix handler issue. If run more than once it creates more than one tracking constraint'''
+    bpy.data.objects["Camera"].select_set(True)
+    bpy.ops.object.constraint_add(type='TRACK_TO')
+    bpy.context.object.constraints["Track To"].target = bpy.data.objects["Cube"]
+     
+def setRotation():
+    """ Set handlers to call the rotateCamera function."""
+    # clear old handlers
+    bpy.app.handlers.frame_change_pre.clear()
+    #register a new handler
+    bpy.app.handlers.frame_change_pre.append(rotateCamera)
+    
+def random_rotate(obj):
+    rx = random.uniform(-60, 0)
+    ry = random.uniform(-180,180)
+    rz=random.uniform(-15,90)
+    print(rx, ry, rz)
+    bpy.context.object.rotation_mode = 'XYZ'
     bpy.ops.object.select_all(action="DESELECT")
     bpy.data.objects[obj].select_set(True)
-    bpy.ops.transform.rotate(value=r)
-    bpy.ops.transform.rotate(value=r, orient_axis='Z')
-    bpy.ops.transform.rotate(value=r, orient_axis='Y')
-    bpy.ops.transform.rotate(value=r, orient_axis='X')
+    #bpy.ops.transform.rotate(value=r)
+    bpy.ops.transform.rotate(value=rz, orient_axis='Z')
+    bpy.ops.transform.rotate(value=ry, orient_axis='Y')
+    bpy.ops.transform.rotate(value=rx, orient_axis='X')
 
 
 def delete_cube():
@@ -169,7 +222,7 @@ def delete_obj(obj):
         pass
 
 
-def light_aug(intensity):
+def light_aug():
     """this function augments the position of the light source. The location and light intensity could be randomized"""
     # Delete old light
     bpy.ops.object.select_by_type(type="LIGHT")
@@ -179,18 +232,18 @@ def light_aug(intensity):
 
     # Create new light datablock.
     light_data = bpy.data.lights.new(name="New Light", type="POINT")
-    light_data.energy = float(intensity)
+    light_data.energy = 30
     print(str(light_data.energy))
 
     # Create new object with our light datablock.
     light_object = bpy.data.objects.new(name="New Light", object_data=light_data)
-
     # Link light object to the active collection of current view layer,
     # so that it'll appear in the current scene.
     view_layer.active_layer_collection.collection.objects.link(light_object)
     # Place light to a specified location.
     light_object.location = (7.68889, -6.78579, 4.08386)
     light_object.rotation_euler = (-0.29215, 15.3403, -0.555648)
+    bpy.data.lights["New Light"].energy = 1000
 
     # And finally select it and make it active.
     light_object.select_set(True)
@@ -198,7 +251,11 @@ def light_aug(intensity):
     # Sets the location of the light so that object is illuminated
     print(list(bpy.data.objects))
 
-
+def cycle_light():
+    light = bpy.data.objects['Light']
+    light_strength = 0
+    light.data.use_nodes = True
+    light.data.node_tree.nodes['Emission'].inputs['Strength'].default_value = light_strength
 
 #need to remove materials b/c they are staying with each iteration. 
 # render a png of image
@@ -281,86 +338,79 @@ def generate(path):
     for number in iterator: 
         import_object(path)
         resize(obj)
-        rotate(obj)
+        random_rotate(obj)
         delete_cube()
-        light_aug(1000)
+        #light_aug()
+        cycle_light()
         render_obj(obj, number)
         delete_obj(obj)
+        print
 
 source = PATH_MAIN
 destination_images = '/home/nalkuq/nunalleq_cv/blender_images/'
 destination_masks = "/home/nalkuq/nunalleq_cv/blender_masks/"
 
 def iteration():
+    os.chdir(source)
     for x in os.listdir():
         if x.endswith(".glb"):
             generate(x)
+        file_mover()
+    mask_fix()
+    denoise()
 
+
+def file_mover():
+    os.chdir(source)
+    for x in os.listdir():
+        if x.endswith("mask.png"):
+            print(x)
+            src_path = os.path.join(source, x)
+            dst_path = os.path.join(destination_masks, x)
+            shutil.move(src_path, dst_path)
+            os.chdir(source)
+        if x.endswith("image.png"): 
+            print(x)
+            src_path = os.path.join(source, x)
+            dst_path = os.path.join(destination_images, x)
+            shutil.move(src_path, dst_path)
+            os.chdir(source)
+
+
+def mask_fix():
+    '''Blender rendered mask.png files have errors. This function rests the .png file so that it works with synthetic.py'''
+    os.chdir(destination_masks)
+    for x in os.listdir():
+        image=PIL.Image.open(x)
+        rgba=image.convert("RGBA")
+        datas=rgba.getdata()
+        newData=[]
+        for item in datas:
+            if item[0]!=255 and item[1]!=255 and item[2]!=255:
+                newData.append((0,0,0,1))
+            else: 
+                newData.append(item)
+        rgba.putdata(newData)
+        rgba.save(x, "PNG")
+        print(image)
+    os.chdir(source)
+
+#denoises image to remove black pixels around border of mask 
+def denoise():
+    os.chdir(destination_masks)
+    for x in os.listdir():
+        filename=x
+        img = cv.imread(x, cv.IMREAD_GRAYSCALE)
+        assert img is not None, "file could not be read, check with os.path.exists()"
+        kernel = np.ones((5,5),np.uint8)
+        opening = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
+        cv.imwrite(filename, opening)
+        print(x)
+    os.chdir(source)
 
 if __name__ == "__main__":
     iteration()
+    
 
 
 
-for x in os.listdir():
-    if x.endswith("mask.png"):
-        print(x)
-        src_path = os.path.join(source, x)
-        dst_path = os.path.join(destination_masks, x)
-        shutil.move(src_path, dst_path)
-    if x.endswith("image.png"): 
-        print(x)
-        src_path = os.path.join(source, x)
-        dst_path = os.path.join(destination_images, x)
-        shutil.move(src_path, dst_path)
-        os.chdir(source)
-
-source = PATH_MAIN
-destination_images = '/home/nalkuq/nunalleq_cv/blender_images/'
-destination_masks = "/home/nalkuq/nunalleq_cv/blender_masks/"
-
-os.chdir(source)
-
-for x in os.listdir():
-    if x.endswith("mask.png"):
-        print(x)
-        src_path = os.path.join(source, x)
-        dst_path = os.path.join(destination_masks, x)
-        shutil.move(src_path, dst_path)
-        os.chdir(source)
-    if x.endswith("image.png"): 
-        print(x)
-        src_path = os.path.join(source, x)
-        dst_path = os.path.join(destination_images, x)
-        shutil.move(src_path, dst_path)
-        os.chdir(source)
-
-
-os.chdir(destination_masks)
-
-#resets Blender Mask PNG so it works with syntehtic.py
-for x in os.listdir():
-    image=PIL.Image.open(x)
-    rgba=image.convert("RGBA")
-    datas=rgba.getdata()
-    newData=[]
-    for item in datas:
-        if item[0]!=255 and item[1]!=255 and item[2]!=255:
-            newData.append((0,0,0,1))
-        else: 
-            newData.append(item)
-    rgba.putdata(newData)
-    rgba.save(x, "PNG")
-    print(image)
-
-#denoises image to remove black pixels around border of mask and image 
-for x in os.listdir():
-    filename=x
-    img = cv.imread(x, cv.IMREAD_GRAYSCALE)
-    assert img is not None, "file could not be read, check with os.path.exists()"
-    kernel = np.ones((5,5),np.uint8)
-    opening = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
-    cv.imwrite(filename, opening)
-    print(x)
-
-  
