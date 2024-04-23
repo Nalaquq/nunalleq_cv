@@ -548,6 +548,9 @@
 │   ├── blenderproc
 │   │   ├── __init__.py
 │   │   ├── __main__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-310.pyc
+│   │   │   └── version.cpython-310.pyc
 │   │   ├── api
 │   │   │   ├── __init__.py
 │   │   │   ├── camera
@@ -1052,6 +1055,12 @@
 │   │   │   ├── coco_annotations
 │   │   │   │   ├── README.md
 │   │   │   │   ├── main.py
+│   │   │   │   ├── output
+│   │   │   │   │   └── coco_data
+│   │   │   │   │       ├── coco_annotations.json
+│   │   │   │   │       └── images
+│   │   │   │   │           ├── 000000.jpg
+│   │   │   │   │           └── 000001.jpg
 │   │   │   │   └── scene.blend
 │   │   │   ├── diffuse_color_image
 │   │   │   │   ├── README.md
@@ -1363,13 +1372,264 @@
 │   │   ├── suncg_with_cam_sampling_output-summary.jpg
 │   │   └── suncg_with_object_replacer_result.jpg
 │   ├── output
-│   │   └── 0.hdf5
+│   │   ├── 0.hdf5
+│   │   ├── 1.hdf5
+│   │   ├── 10.hdf5
+│   │   ├── 100.hdf5
+│   │   ├── 101.hdf5
+│   │   ├── 102.hdf5
+│   │   ├── 103.hdf5
+│   │   ├── 104.hdf5
+│   │   ├── 105.hdf5
+│   │   ├── 106.hdf5
+│   │   ├── 107.hdf5
+│   │   ├── 108.hdf5
+│   │   ├── 109.hdf5
+│   │   ├── 11.hdf5
+│   │   ├── 110.hdf5
+│   │   ├── 111.hdf5
+│   │   ├── 112.hdf5
+│   │   ├── 113.hdf5
+│   │   ├── 114.hdf5
+│   │   ├── 115.hdf5
+│   │   ├── 116.hdf5
+│   │   ├── 117.hdf5
+│   │   ├── 118.hdf5
+│   │   ├── 119.hdf5
+│   │   ├── 12.hdf5
+│   │   ├── 120.hdf5
+│   │   ├── 121.hdf5
+│   │   ├── 122.hdf5
+│   │   ├── 123.hdf5
+│   │   ├── 124.hdf5
+│   │   ├── 125.hdf5
+│   │   ├── 126.hdf5
+│   │   ├── 127.hdf5
+│   │   ├── 128.hdf5
+│   │   ├── 129.hdf5
+│   │   ├── 13.hdf5
+│   │   ├── 130.hdf5
+│   │   ├── 131.hdf5
+│   │   ├── 132.hdf5
+│   │   ├── 133.hdf5
+│   │   ├── 134.hdf5
+│   │   ├── 135.hdf5
+│   │   ├── 136.hdf5
+│   │   ├── 137.hdf5
+│   │   ├── 138.hdf5
+│   │   ├── 139.hdf5
+│   │   ├── 14.hdf5
+│   │   ├── 140.hdf5
+│   │   ├── 141.hdf5
+│   │   ├── 142.hdf5
+│   │   ├── 143.hdf5
+│   │   ├── 144.hdf5
+│   │   ├── 145.hdf5
+│   │   ├── 146.hdf5
+│   │   ├── 147.hdf5
+│   │   ├── 148.hdf5
+│   │   ├── 149.hdf5
+│   │   ├── 15.hdf5
+│   │   ├── 150.hdf5
+│   │   ├── 151.hdf5
+│   │   ├── 152.hdf5
+│   │   ├── 153.hdf5
+│   │   ├── 154.hdf5
+│   │   ├── 155.hdf5
+│   │   ├── 156.hdf5
+│   │   ├── 157.hdf5
+│   │   ├── 158.hdf5
+│   │   ├── 159.hdf5
+│   │   ├── 16.hdf5
+│   │   ├── 160.hdf5
+│   │   ├── 161.hdf5
+│   │   ├── 162.hdf5
+│   │   ├── 163.hdf5
+│   │   ├── 164.hdf5
+│   │   ├── 165.hdf5
+│   │   ├── 166.hdf5
+│   │   ├── 167.hdf5
+│   │   ├── 168.hdf5
+│   │   ├── 169.hdf5
+│   │   ├── 17.hdf5
+│   │   ├── 170.hdf5
+│   │   ├── 171.hdf5
+│   │   ├── 172.hdf5
+│   │   ├── 173.hdf5
+│   │   ├── 174.hdf5
+│   │   ├── 175.hdf5
+│   │   ├── 176.hdf5
+│   │   ├── 177.hdf5
+│   │   ├── 178.hdf5
+│   │   ├── 179.hdf5
+│   │   ├── 18.hdf5
+│   │   ├── 180.hdf5
+│   │   ├── 181.hdf5
+│   │   ├── 182.hdf5
+│   │   ├── 183.hdf5
+│   │   ├── 184.hdf5
+│   │   ├── 185.hdf5
+│   │   ├── 186.hdf5
+│   │   ├── 187.hdf5
+│   │   ├── 188.hdf5
+│   │   ├── 189.hdf5
+│   │   ├── 19.hdf5
+│   │   ├── 190.hdf5
+│   │   ├── 191.hdf5
+│   │   ├── 192.hdf5
+│   │   ├── 193.hdf5
+│   │   ├── 194.hdf5
+│   │   ├── 195.hdf5
+│   │   ├── 196.hdf5
+│   │   ├── 197.hdf5
+│   │   ├── 198.hdf5
+│   │   ├── 199.hdf5
+│   │   ├── 2.hdf5
+│   │   ├── 20.hdf5
+│   │   ├── 200.hdf5
+│   │   ├── 201.hdf5
+│   │   ├── 202.hdf5
+│   │   ├── 203.hdf5
+│   │   ├── 204.hdf5
+│   │   ├── 205.hdf5
+│   │   ├── 206.hdf5
+│   │   ├── 207.hdf5
+│   │   ├── 208.hdf5
+│   │   ├── 209.hdf5
+│   │   ├── 21.hdf5
+│   │   ├── 210.hdf5
+│   │   ├── 211.hdf5
+│   │   ├── 212.hdf5
+│   │   ├── 213.hdf5
+│   │   ├── 214.hdf5
+│   │   ├── 215.hdf5
+│   │   ├── 216.hdf5
+│   │   ├── 217.hdf5
+│   │   ├── 218.hdf5
+│   │   ├── 219.hdf5
+│   │   ├── 22.hdf5
+│   │   ├── 220.hdf5
+│   │   ├── 221.hdf5
+│   │   ├── 222.hdf5
+│   │   ├── 223.hdf5
+│   │   ├── 224.hdf5
+│   │   ├── 225.hdf5
+│   │   ├── 226.hdf5
+│   │   ├── 227.hdf5
+│   │   ├── 228.hdf5
+│   │   ├── 229.hdf5
+│   │   ├── 23.hdf5
+│   │   ├── 230.hdf5
+│   │   ├── 231.hdf5
+│   │   ├── 232.hdf5
+│   │   ├── 233.hdf5
+│   │   ├── 234.hdf5
+│   │   ├── 235.hdf5
+│   │   ├── 236.hdf5
+│   │   ├── 237.hdf5
+│   │   ├── 238.hdf5
+│   │   ├── 239.hdf5
+│   │   ├── 24.hdf5
+│   │   ├── 240.hdf5
+│   │   ├── 241.hdf5
+│   │   ├── 242.hdf5
+│   │   ├── 243.hdf5
+│   │   ├── 244.hdf5
+│   │   ├── 245.hdf5
+│   │   ├── 246.hdf5
+│   │   ├── 247.hdf5
+│   │   ├── 248.hdf5
+│   │   ├── 249.hdf5
+│   │   ├── 25.hdf5
+│   │   ├── 250.hdf5
+│   │   ├── 26.hdf5
+│   │   ├── 27.hdf5
+│   │   ├── 28.hdf5
+│   │   ├── 29.hdf5
+│   │   ├── 3.hdf5
+│   │   ├── 30.hdf5
+│   │   ├── 31.hdf5
+│   │   ├── 32.hdf5
+│   │   ├── 33.hdf5
+│   │   ├── 34.hdf5
+│   │   ├── 35.hdf5
+│   │   ├── 36.hdf5
+│   │   ├── 37.hdf5
+│   │   ├── 38.hdf5
+│   │   ├── 39.hdf5
+│   │   ├── 4.hdf5
+│   │   ├── 40.hdf5
+│   │   ├── 41.hdf5
+│   │   ├── 42.hdf5
+│   │   ├── 43.hdf5
+│   │   ├── 44.hdf5
+│   │   ├── 45.hdf5
+│   │   ├── 46.hdf5
+│   │   ├── 47.hdf5
+│   │   ├── 48.hdf5
+│   │   ├── 49.hdf5
+│   │   ├── 5.hdf5
+│   │   ├── 50.hdf5
+│   │   ├── 51.hdf5
+│   │   ├── 52.hdf5
+│   │   ├── 53.hdf5
+│   │   ├── 54.hdf5
+│   │   ├── 55.hdf5
+│   │   ├── 56.hdf5
+│   │   ├── 57.hdf5
+│   │   ├── 58.hdf5
+│   │   ├── 59.hdf5
+│   │   ├── 6.hdf5
+│   │   ├── 60.hdf5
+│   │   ├── 61.hdf5
+│   │   ├── 62.hdf5
+│   │   ├── 63.hdf5
+│   │   ├── 64.hdf5
+│   │   ├── 65.hdf5
+│   │   ├── 66.hdf5
+│   │   ├── 67.hdf5
+│   │   ├── 68.hdf5
+│   │   ├── 69.hdf5
+│   │   ├── 7.hdf5
+│   │   ├── 70.hdf5
+│   │   ├── 71.hdf5
+│   │   ├── 72.hdf5
+│   │   ├── 73.hdf5
+│   │   ├── 74.hdf5
+│   │   ├── 75.hdf5
+│   │   ├── 76.hdf5
+│   │   ├── 77.hdf5
+│   │   ├── 78.hdf5
+│   │   ├── 79.hdf5
+│   │   ├── 8.hdf5
+│   │   ├── 80.hdf5
+│   │   ├── 81.hdf5
+│   │   ├── 82.hdf5
+│   │   ├── 83.hdf5
+│   │   ├── 84.hdf5
+│   │   ├── 85.hdf5
+│   │   ├── 86.hdf5
+│   │   ├── 87.hdf5
+│   │   ├── 88.hdf5
+│   │   ├── 89.hdf5
+│   │   ├── 9.hdf5
+│   │   ├── 90.hdf5
+│   │   ├── 91.hdf5
+│   │   ├── 92.hdf5
+│   │   ├── 93.hdf5
+│   │   ├── 94.hdf5
+│   │   ├── 95.hdf5
+│   │   ├── 96.hdf5
+│   │   ├── 97.hdf5
+│   │   ├── 98.hdf5
+│   │   └── 99.hdf5
 │   ├── paper.bib
 │   ├── paper.md
 │   ├── rerun.py
 │   ├── resources
 │   │   └── README.md
 │   ├── setup.py
+│   ├── test.py
 │   ├── tests
 │   │   ├── README.md
 │   │   ├── run_all.py
@@ -1386,18 +1646,6 @@
 │   └── untitled.ply
 ├── LICENSE
 ├── Seal_Uluaq_27906.glb
-├── Seal_Uluaq_27906_1_2024_02_06-03_10_12_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-03_10_12_PM_mask.png
-├── Seal_Uluaq_27906_1_2024_02_06-03_16_57_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-03_16_57_PM_mask.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_48_51_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_48_51_PM_mask.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_52_03_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_52_03_PM_mask.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_53_55_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_53_55_PM_mask.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_55_32_PM_image.png
-├── Seal_Uluaq_27906_1_2024_02_06-07_55_32_PM_mask.png
 ├── TODO.txt
 ├── __pycache__
 │   ├── blender.cpython-310.pyc
@@ -1406,12 +1654,19 @@
 ├── best_ulu.pt
 ├── blender.py
 ├── blender_images
-│   ├── Seal_Uluaq_27906_0_2024_02_01-10_28_30_PM_image.png
-│   └── Seal_Uluaq_27906_0_2024_02_06-10_55_29_AM_image.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_39_31_PM_image.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_40_29_PM_image.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_43_20_PM_image.png
+│   ├── Seal_Uluaq_27906_0_2024_04_08-12_38_31_AM_image.png
+│   └── Seal_Uluaq_27906_0_2024_04_19-10_17_24_AM_image.png
 ├── blender_mask_fix.py
 ├── blender_masks
-│   ├── Seal_Uluaq_27906_0_2024_02_01-10_28_30_PM_mask.png
-│   └── Seal_Uluaq_27906_0_2024_02_06-10_55_29_AM_mask.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_39_31_PM_mask.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_40_29_PM_mask.png
+│   ├── Seal_Uluaq_27906_0_2024_04_05-08_43_20_PM_mask.png
+│   ├── Seal_Uluaq_27906_0_2024_04_08-12_38_31_AM_mask.png
+│   └── Seal_Uluaq_27906_0_2024_04_19-10_17_24_AM_mask.png
+├── blender_synth.py
 ├── chroma.py
 ├── data
 │   ├── background
@@ -4395,8 +4650,7 @@
 │       │   ├── 015_ulu.jpg
 │       │   ├── 016_ulu.jpg
 │       │   ├── 017_ulu.jpg
-│       │   ├── 018_ulu.jpg
-│       │   └── 29992024_01_17-09_34_49_PM.jpg
+│       │   └── 018_ulu.jpg
 │       └── masks
 │           ├── 001_ulu.png
 │           ├── 002_ulu.png
@@ -64428,7 +64682,6 @@
 │       │   ├── 9982024_01_18-12_25_32_AM.txt
 │       │   └── 9992024_01_18-12_25_32_AM.txt
 │       └── labels.cache
-├── h_00c6295e.jpg
 ├── parser.py
 ├── readme.md
 ├── requirements.txt
@@ -65438,6 +65691,30 @@
 │   └── yolov8n.pt
 ├── yolov8-onnxruntime-web
 │   ├── README.md
+│   ├── build
+│   │   ├── asset-manifest.json
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   ├── model
+│   │   │   ├── best_ulu_1_25_24.onnx
+│   │   │   ├── nms-yolov8.onnx
+│   │   │   └── yolov8n.onnx
+│   │   ├── robots.txt
+│   │   └── static
+│   │       ├── css
+│   │       │   ├── main.ed755b1a.css
+│   │       │   └── main.ed755b1a.css.map
+│   │       └── js
+│   │           ├── main.ee45256a.js
+│   │           ├── main.ee45256a.js.LICENSE.txt
+│   │           ├── main.ee45256a.js.map
+│   │           ├── ort-wasm-simd-threaded.wasm
+│   │           ├── ort-wasm-simd.wasm
+│   │           ├── ort-wasm-threaded.wasm
+│   │           └── ort-wasm.wasm
 │   ├── craco.config.js
 │   ├── node_modules
 │   │   ├── @ampproject
@@ -102374,4 +102651,4 @@
 │   └── yarn.lock
 └── yolov8n.pt
 
-4656 directories, 97718 files
+4665 directories, 97986 files

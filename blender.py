@@ -338,7 +338,7 @@ def generate(path):
     for number in iterator: 
         import_object(path)
         resize(obj)
-        random_rotate(obj)
+        #random_rotate(obj)
         delete_cube()
         #light_aug()
         cycle_light()
