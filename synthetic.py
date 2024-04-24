@@ -7,6 +7,7 @@ import albumentations as A
 import time
 from tqdm import tqdm
 from datetime import datetime
+import yaml
 
 parser = argparse.ArgumentParser(description="Generates Synthetic Datasets for YOLO Object Detection.")
 # add optional arguments
@@ -26,38 +27,72 @@ parser.add_argument(
 parser.add_argument("-min", type=int, help="the minimum size of images produced. The default is 150px.", default=150)
 # this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
 parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
+parser.add_argument("-erase", "-erase_existing_dataset", type=bool, help="Boolean value that deletes all files in dataset directory before generation. Default is false, so that labels and images will not be deleted between runs.", default=True)
+parser.add_argument("-config", "-config_file", type=os.path.abspath, help="The location of the config.yaml file containing your albumentations configurations. If not selected synthetic.py will try to load config.py", default='config.yaml')
 args = parser.parse_args()
-
-parser.add_argument("-erase", "-erase_existing_dataset", type=bool, help="Boolean value that deletes all files in dataset directory before generation. Default is false, so that labels and images will not be deleted between runs.", default=False)
 
 if args.src:
     PATH_MAIN = args.src
 else:
     PATH_MAIN = os.path.abspath('data')
     print(
-        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more."
+        f"\n No source directory given. Main Path set to {PATH_MAIN}. Please use python3 synthetic.py -h to learn more.\n"
     )
+if args.config:
+    yaml_path = args.config
+else: 
+    yaml_path = 'config.yaml'
 
-obj_dict = {
-    #1: {"folder": "caveg", "longest_min": args.min, "longest_max": args.max},
-    #2: {"folder": "endblades", "longest_min": args.min, "longest_max": args.max},
-    #3: {"folder": "tops", "longest_min": args.min, "longest_max": args.max},
-    1: {"folder": "ulus", "longest_min": args.min, "longest_max": args.max},
-}
+def obj_list():
+    """
+    Generates a dictionary that maps folder indices to their respective image and mask file paths.
 
-for k, _ in obj_dict.items():
-    folder_name = obj_dict[k]["folder"]
+    This function walks through directories located at the path specified by PATH_MAIN, constructing a
+    dictionary where each entry corresponds to a folder and contains details like the folder name, and
+    paths to all image and mask files within that folder. The function also adjusts for a specific folder
+    (typically at index 1) by removing it from the dictionary, assuming it does not follow the same
+    directory structure as the others.
 
-    files_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "images")))
-    files_imgs = [os.path.join(PATH_MAIN, folder_name, "images", f) for f in files_imgs]
+    The function assumes the global variables `args.min` and `args.max` are accessible and contain
+    relevant bounds which are included in the dictionary for each folder. It also relies on a global
+    PATH_MAIN which should be defined externally and points to the main directory path.
 
-    files_masks = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "masks")))
-    files_masks = [
-        os.path.join(PATH_MAIN, folder_name, "masks", f) for f in files_masks
-    ]
+    Returns:
+        dict: A dictionary where each key is an integer index and each value is a dictionary containing
+        the 'folder' name, a list of 'images' file paths, a list of 'masks' file paths, and the
+        'longest_min' and 'longest_max' values pulled from global args.
 
-    obj_dict[k]["images"] = files_imgs
-    obj_dict[k]["masks"] = files_masks
+    Raises:
+        FileNotFoundError: If PATH_MAIN does not exist or specified folders are not found.
+        IndexError: If there is an attempt to delete a non-existing index from the dictionary.
+
+    Note:
+        This function directly modifies the dictionary by deleting the entry at index 1 and assumes
+        specific global configurations, which might lead to errors if not properly setup.
+    """
+    obj_dict = {}
+    folder_count = len(next(os.walk(PATH_MAIN))[1])
+    for f in range(folder_count):
+        obj_dict[f] = {
+            "folder": next(os.walk(PATH_MAIN))[1][f],
+            "longest_min": args.min,
+            "longest_max": args.max,
+            }
+    # delete the "background images" since it does not have the same directory structure
+    del obj_dict[1]
+    temp_list=list(range(len(obj_dict)))
+    obj_dict=dict(zip(temp_list, list(obj_dict.values())))
+    for k, _ in obj_dict.items():
+        folder_name = obj_dict[k]["folder"]
+
+        files_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "images")))
+        files_imgs = [os.path.join(PATH_MAIN, folder_name, "images", f) for f in files_imgs]
+
+        files_masks = sorted(os.listdir(os.path.join(PATH_MAIN, folder_name, "masks")))
+        files_masks = [os.path.join(PATH_MAIN, folder_name, "masks", f) for f in files_masks]
+        obj_dict[k]["images"] = files_imgs
+        obj_dict[k]["masks"] = files_masks
+    return obj_dict
 
 
 files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "background")))
@@ -72,100 +107,64 @@ files_bg_noise_masks = [
     os.path.join(PATH_MAIN, "bg_noise", "masks", f) for f in files_bg_noise_masks
 ]
 
-def obj_list():
-    # could fix this solution with try/except blocks
-    PATH_MAIN = args.src
-    try:
-        obj_dict = {}
-        folder_count = len(next(os.walk(PATH_MAIN))[1])
-        for f in range(folder_count):
-            obj_dict[f] = {
-                "folder": next(os.walk(PATH_MAIN))[1][f],
-                "longest_min": 150,
-                "longest_max": 800,
-            }
-        # delete the "background images" since it does not have the same directory structure
-        del obj_dict[1]
-        print(obj_dict)
-    except:
-        print(f"didn't work is {PATH_MAIN} a directory?")
-        pass
 
-    try:
-        for k, _ in obj_dict.items():
-            folder_name = obj_dict[k]["folder"]
-            files_imgs = sorted(
-                os.listdir(os.path.join(PATH_MAIN, folder_name, "images"))
-            )
-            files_imgs = [
-                os.path.join(PATH_MAIN, folder_name, "images", f) for f in files_imgs
-            ]
-            files_masks = sorted(
-                os.listdir(os.path.join(PATH_MAIN, folder_name, "masks"))
-            )
-            files_masks = [
-                os.path.join(PATH_MAIN, folder_name, "masks", f) for f in files_masks
-            ]
-            obj_dict[k]["images"] = files_imgs
-            obj_dict[k]["masks"] = files_masks
-            print(
-                f"\nThe first five files from directory the sorted list of images in {folder_name}:",
-                obj_dict[k]["images"][:5],
-            )
-            print(
-                f"\nThe first five files from the sorted list of masks in {folder_name}:",
-                obj_dict[k]["masks"][:5],
-            )
+def get_img_and_mask(img_path: str, mask_path: str) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Load an image and its corresponding mask from specified file paths, convert both to RGB format, and process the mask into a binary format.
 
-        files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "background")))
-        files_bg_imgs = [
-            os.path.join(PATH_MAIN, "background", f) for f in files_bg_imgs
-        ]
-        print(
-            "\nThe first five files from the sorted list of background images:",
-            files_bg_imgs[:5],
-        )
-    except:
-        print(
-            "An error occurred. Ensure that your files are ordered and sorted into images and masks correctly."
-        )
-        pass
-    return obj_dict
+    Parameters:
+        img_path (str): The file path to the image.
+        mask_path (str): The file path to the mask image.
 
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: A tuple containing the RGB image and the binary mask as NumPy arrays.
 
-def get_img_and_mask(img_path, mask_path):
+    Raises:
+        IOError: If the files specified do not exist or cannot be opened.
+        ValueError: If the image files are not in a format that can be converted to RGB.
+
+    Example:
+        >>> image, binary_mask = get_img_and_mask("path/to/image.jpg", "path/to/mask.jpg")
+        This will load the image and mask from the specified paths, convert them to RGB, and convert the mask to a binary format.
+    """
     img = cv2.imread(img_path)
+    if img is None:
+        raise IOError(f"Unable to open image file: {img_path}")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     mask = cv2.imread(mask_path)
+    if mask is None:
+        raise IOError(f"Unable to open mask file: {mask_path}")
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
-    mask_b = mask[:, :, 0] == 0  # This is boolean mask
-    mask = mask_b.astype(np.uint8)  # This is binary mask
+    mask_b = mask[:, :, 0] == 0  # This is a boolean mask indicating where the mask is applied
+    mask = mask_b.astype(np.uint8)  # Convert boolean mask to binary format
 
     return img, mask
 
 
-def test_mask():
-    x = obj_list()
-    print(x)
-    print("\n \n \n Testing Binary Mask Conversion \n \n \n")
-    img_path = x[0]["images"][0]
-    mask_path = x[0]["masks"][0]
-    img, mask = get_img_and_mask(img_path, mask_path)
-    print("Image file:", img_path)
-    print("Mask file:", mask_path)
-    print("\nShape of the image of the object:", img.shape)
-    print("Shape of the binary mask:", mask.shape)
-    fig, ax = plt.subplots(1, 2, figsize=(16, 7))
-    ax[0].imshow(img)
-    ax[0].set_title("Object", fontsize=18)
-    ax[1].imshow(mask)
-    ax[1].set_title("Binary mask", fontsize=18)
-    print("\n \n \n Binary Mask Conversion is Sucessful \n \n \n")
+def resize_img(img: np.ndarray, desired_max: int, desired_min: int =None) -> np.ndarray:
+    """
+    Resize an image to the specified maximum and optional minimum dimensions, maintaining aspect ratio.
 
+    Parameters:
+        img (np.ndarray): The input image as a NumPy array.
+        desired_max (_int_): The maximum size for the longest dimension of the image.
+        desired_min (Optional[_int_]): The minimum size for the shortest dimension of the image.
+            If None, the aspect ratio is maintained.
 
-def resize_img(img, desired_max, desired_min=None):
+    Returns:
+        np.ndarray: The resized image as a NumPy array.
+
+    Raises:
+        ValueError: If any of the input dimensions are not positive integers.
+
+    Example:
+        >>> img_resized = resize_img(image_array, 800, 600)
+        This would resize `image_array` to have the longest dimension be 800 pixels, and the
+        shortest dimension proportionally resized to maintain aspect ratio, unless 600 is provided,
+        then it resizes the shortest dimension to 600 pixels directly.
+    """
     h, w = img.shape[0], img.shape[1]
 
     longest, shortest = max(h, w), min(h, w)
@@ -194,38 +193,65 @@ def resize_img(img, desired_max, desired_min=None):
     return img_r
 
 
-# let's look how a random background image can be resized with resize_img() function
-def test_background():
-    PATH_MAIN = args.src
-    files_bg_imgs = sorted(os.listdir(os.path.join(PATH_MAIN, "background")))
-    files_bg_imgs = [os.path.join(PATH_MAIN, "background", f) for f in files_bg_imgs]
-    img_bg_path = files_bg_imgs[5]
-    img_bg = cv2.imread(img_bg_path)
-    img_bg = cv2.cvtColor(img_bg, cv2.COLOR_BGR2RGB)
+def load_transformations_from_yaml(yaml_path: str) -> list:
+    """
+    Load transformation configurations from a YAML file and create corresponding Albumentations objects.
 
-    img_bg_resized_1 = resize_img(img_bg, desired_max=1920, desired_min=None)
-    img_bg_resized_2 = resize_img(img_bg, desired_max=1920, desired_min=1080)
+    Parameters:
+        yaml_path (str): Path to the YAML file containing the transformation configurations.
 
-    print("Shape of the original background image:", img_bg.shape)
+    Returns:
+        dict: A dictionary containing Albumentations Compose objects for background and object transformations.
+    """
+    # Load YAML file
+    with open(yaml_path, 'r') as file:
+        config = yaml.safe_load(file)
 
-    print(
-        "Shape of the resized background image (desired_max=1920, desired_min=None):",
-        img_bg_resized_1.shape,
-    )
-    print(
-        "Shape of the resized background image (desired_max=1920, desired_min=1080):",
-        img_bg_resized_2.shape,
-    )
+    # Helper function to construct an Albumentations Compose object from a list of transformations
+    def construct_transformation(transform_config):
+        transformations = []
+        for transform in transform_config:
+            for key, value in transform.items():
+                transform_class = getattr(A, key)
+                transformations.append(transform_class(**value))
+        return A.Compose(transformations)
 
-    fig, ax = plt.subplots(1, 2, figsize=(16, 7))
-    ax[0].imshow(img_bg_resized_1)
-    ax[0].set_title("Resized (desired_max=1920, desired_min=None)", fontsize=18)
-    ax[1].imshow(img_bg_resized_2)
-    ax[1].set_title("Resized (desired_max=1920, desired_min=1080)", fontsize=18)
+    # Create transformation objects from YAML config
+    transformations = {key: construct_transformation(value) for key, value in config.items()}
+    print("Background and Object Transformations loaded successfully.")
+    return transformations 
+
+transformation_objects = load_transformations_from_yaml(yaml_path)
+transforms_bg_obj = transformation_objects['transforms_bg_obj']
+transforms_obj = transformation_objects['transforms_obj']
 
 
-def resize_transform_obj(img, mask, longest_min, longest_max, transforms=False):
-    h, w = mask.shape[0], mask.shape[1]
+
+
+def resize_transform_obj(img: np.ndarray, mask: np.ndarray, longest_min: int, longest_max: int, transforms: bool = None) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Resizes an image and its corresponding mask to a new size, randomly determined within specified bounds for the longest dimension, and optionally applies additional transformations.
+
+    Parameters:
+        img (np.ndarray): The image to be transformed, expected to be a NumPy array.
+        mask (np.ndarray): The mask corresponding to the image, expected to be a NumPy array of the same dimensions as the image.
+        longest_min (int): The minimum value for the longest dimension of the resized image and mask.
+        longest_max (int): The maximum value for the longest dimension of the resized image and mask.
+        transforms (bool): A function or composed set of transformations to apply to the resized image and mask. If False, no additional transformations are applied.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: A tuple containing the resized and possibly transformed image and mask.
+
+    Raises:
+        ValueError: If the `longest_min` is greater than `longest_max`.
+        IndexError: If the dimensions of `mask` do not match the dimensions of `img`.
+
+    Example:
+        >>> image, mask = resize_transform_obj(image_array, mask_array, 300, 500)
+        This will resize `image_array` and `mask_array` to a random size between 300 and 500 pixels for the longest dimension,
+        maintaining the aspect ratio, and apply additional transformations if provided.
+    """
+    h, w = mask.shape[:2]
 
     longest, shortest = max(h, w), min(h, w)
     longest_new = np.random.randint(longest_min, longest_max)
@@ -248,58 +274,6 @@ def resize_transform_obj(img, mask, longest_min, longest_max, transforms=False):
         mask_t = transformed["mask"]
 
     return img_t, mask_t
-
-
-transforms_bg_obj = A.Compose(
-    [
-        A.RandomRotate90(p=1),
-        A.ColorJitter(
-            brightness=0.3,
-            contrast=0.3,
-            saturation=0.3,
-            hue=0.07,
-            always_apply=False,
-            p=1,
-        ),
-        A.Blur(blur_limit=(3, 15), always_apply=False, p=0.5),
-    ]
-)
-
-transforms_obj = A.Compose(
-    [
-        A.RandomRotate90(p=1),
-        A.RandomBrightnessContrast(
-            brightness_limit=(-0.5, 0.2),
-            contrast_limit=0.1,
-            brightness_by_max=True,
-            always_apply=False,
-            p=1,
-        ),
-    ]
-)
-
-
-# test transforms
-def test_transform():
-    x = obj_list()
-    print("\n \n \n Testing Binary Mask Transformation \n \n \n")
-    img_path = x[0]["images"][0]
-    mask_path = x[0]["masks"][0]
-    img, mask = get_img_and_mask(img_path, mask_path)
-    img_t, mask_t = resize_transform_obj(
-        img, mask, longest_min=300, longest_max=400, transforms=transforms_obj
-    )
-
-    print("Shape of the image of the transformed object:", img_t.shape)
-    print("Shape of the transformed binary mask:", mask_t.shape)
-    print("\n")
-
-    fig, ax = plt.subplots(1, 2, figsize=(16, 7))
-    ax[0].imshow(img_t)
-    ax[0].set_title("Transformed object", fontsize=18)
-    ax[1].imshow(mask_t)
-    ax[1].set_title("Transformed binary mask", fontsize=18)
-
 
 def add_obj(img_comp, mask_comp, img, mask, x, y, idx):
     """
@@ -454,6 +428,7 @@ def check_areas(mask_comp, obj_areas, overlap_degree=0.3):
 def create_composition(
     img_comp_bg, max_objs=15, overlap_degree=0.2, max_attempts_per_obj=10
 ):
+    obj_dict=obj_list()
     img_comp = img_comp_bg.copy()
     h, w = img_comp.shape[0], img_comp.shape[1]
     mask_comp = np.zeros((h, w), dtype=np.uint8)
@@ -465,7 +440,7 @@ def create_composition(
     i = 1
 
     for _ in range(1, num_objs):
-        obj_idx = np.random.randint(len(obj_dict)) + 1
+        obj_idx = np.random.randint(len(obj_dict)) #+ 1
 
         for _ in range(max_attempts_per_obj):
             imgs_number = len(obj_dict[obj_idx]["images"])
@@ -571,7 +546,6 @@ def generate_dataset(imgs_number, folder, split="train"):
         "Annotations are stored in '{}'".format(os.path.join(folder, split, "labels"))
     )
 
-
 def mkdir():
     try:
         print("\n\n Checking Project Paths:")
@@ -592,29 +566,34 @@ def mkdir():
         print("\n\t Home Directory:'{}' ".format(home))
         print("\n\t Data For Generation: '{}' ".format(PATH_MAIN))
         print("\n\t Generated Datasets Stored in: '{}' ".format(dataset))
-        print("\n Removing Old Datasets from: {}".format(dataset))
-        total_number=[]
         #insert if statement for argparse libary that runs clean remove existing dataset -del if set to true. Default will be false..   
-        for root, dirs, files in os.walk(dataset):
-            for name in tqdm(files): 
-                total_number.append(files)
-                if name.endswith(".jpg"):
-                    selected_files=os.path.join(root, name)
-                    os.remove(selected_files)
-                if name.endswith('.txt'):
-                    selected_files=os.path.join(root,name)
-                    os.remove(selected_files)
-        if len(total_number) == 0: 
-            print("\n Beginning Data Generation\n")
+        total_number=[]
+        if args.erase==True: 
+            print("\n\tThe Erase function has been enabled \n")
+            print("\n Removing Old Datasets from: {}".format(dataset))
+            for root, dirs, files in os.walk(dataset):
+                for name in tqdm(files): 
+                    total_number.append(files)
+                    if name.endswith(".jpg"):
+                        selected_files=os.path.join(root, name)
+                        os.remove(selected_files)
+                    if name.endswith('.txt'):
+                        selected_files=os.path.join(root,name)
+                        os.remove(selected_files)
             print("\n{} files were deleted.".format(len(total_number)))
-        else:
-            print("\n There are {} labels and images in this dataset.".format(len(total_number)))
-            print("\n No files were deleted.")
+        else: 
+            for root, dirs, files in os.walk(dataset):
+                for name in (files):
+                    if name.endswith(".jpg"):
+                        selected_files=os.path.join(root, name)
+                    if name.endswith('.txt'):
+                        selected_files=os.path.join(root,name)
+            print("\n\t {} files were deleted.".format(len(total_number)))
+            print("\n\t There are {} labels and images in this dataset.".format(len(selected_files)))
             print("\n Beginning Data Generation\n")
-        
-                                  
-#to use with generate to create CLI for first input in generate_dataset
-# Should wrap this into a function as well.  
+            pass                                  
+
+#to use with generate to create CLI for first input in generate_dataset  
 def test_train_val_split():
     if args.n <=10:
         print("At least 10 images are needed for an 80/10/10 dataset. Using the default value of 1000 training images.")
@@ -632,6 +611,7 @@ def test_train_val_split():
 
 
 def generate():
+    obj_list()
     mkdir()
     ttv=test_train_val_split()
     generate_dataset(ttv[0], folder="dataset", split="test")
