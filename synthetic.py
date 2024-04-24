@@ -8,8 +8,9 @@ import time
 from tqdm import tqdm
 from datetime import datetime
 import yaml
+from typing import List
 
-parser = argparse.ArgumentParser(description="Generates Synthetic Datasets for YOLO Object Detection.")
+parser = argparse.ArgumentParser(description="Generates Synthetic Datasets for Object Detection.")
 # add optional arguments
 parser.add_argument(
     "-src",
@@ -24,6 +25,8 @@ parser.add_argument(
     help="The number of images to be generated. Images will be generated according to a 80/20/20 Train/Test/Val split",
     default=1000
 )
+parser.add_argument("-io", "-image_overlap", type=float, help="The degree of overlap randomly interpolated by the generator. Set to 0 if you do not want any overlapping images. The default is set to 0.", default=0.0)
+parser.add_argument("-max_obj", "-maximum_objects", type=int, help="The maxinum number of objects to be placed in the scene by the generator. The default is set to 10.", default=10)
 parser.add_argument("-min", type=int, help="the minimum size of images produced. The default is 150px.", default=150)
 # this will throw an error is a max size is selected that is larger than the background image size. Fix this. 
 parser.add_argument("-max", type=int, help="The maximum size of generated images. The defauly is 800px. An error will occur if a max size is selected that is larger than the background image size.", default=800)
@@ -126,6 +129,8 @@ def get_img_and_mask(img_path: str, mask_path: str) -> tuple[np.ndarray, np.ndar
     Example:
         >>> image, binary_mask = get_img_and_mask("path/to/image.jpg", "path/to/mask.jpg")
         This will load the image and mask from the specified paths, convert them to RGB, and convert the mask to a binary format.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection.
     """
     img = cv2.imread(img_path)
     if img is None:
@@ -164,6 +169,8 @@ def resize_img(img: np.ndarray, desired_max: int, desired_min: int =None) -> np.
         This would resize `image_array` to have the longest dimension be 800 pixels, and the
         shortest dimension proportionally resized to maintain aspect ratio, unless 600 is provided,
         then it resizes the shortest dimension to 600 pixels directly.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection.
     """
     h, w = img.shape[0], img.shape[1]
 
@@ -221,10 +228,10 @@ def load_transformations_from_yaml(yaml_path: str) -> list:
     print("Background and Object Transformations loaded successfully.")
     return transformations 
 
+
 transformation_objects = load_transformations_from_yaml(yaml_path)
 transforms_bg_obj = transformation_objects['transforms_bg_obj']
 transforms_obj = transformation_objects['transforms_obj']
-
 
 
 
@@ -250,6 +257,8 @@ def resize_transform_obj(img: np.ndarray, mask: np.ndarray, longest_min: int, lo
         >>> image, mask = resize_transform_obj(image_array, mask_array, 300, 500)
         This will resize `image_array` and `mask_array` to a random size between 300 and 500 pixels for the longest dimension,
         maintaining the aspect ratio, and apply additional transformations if provided.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection.
     """
     h, w = mask.shape[:2]
 
@@ -275,14 +284,29 @@ def resize_transform_obj(img: np.ndarray, mask: np.ndarray, longest_min: int, lo
 
     return img_t, mask_t
 
-def add_obj(img_comp, mask_comp, img, mask, x, y, idx):
+def add_obj(img_comp: np.ndarray, mask_comp: np.ndarray, img: np.ndarray, mask: np.ndarray, x: int, y: int, idx: int) -> tuple:
     """
-    img_comp - composition of objects
-    mask_comp - composition of objects` masks
-    img - image of object
-    mask - binary mask of object
-    x, y - coordinates where center of img is placed
-    Function returns img_comp in CV2 RGB format + mask_comp
+    Incorporates an object and its mask into an existing image composition at specified coordinates.
+
+    Parameters:
+        img_comp (np.ndarray): The existing composition of images in which the new image will be integrated.
+        mask_comp (np.ndarray): The existing composition of masks corresponding to img_comp.
+        img (np.ndarray): The image of the object to be added.
+        mask (np.ndarray): The binary mask of the object to be added.
+        x (int): The x-coordinate where the center of the object image is to be placed.
+        y (int): The y-coordinate where the center of the object image is to be placed.
+        idx (int): The index used to identify the object in the mask composition.
+
+    Returns:
+        tuple: A tuple containing the updated image composition, mask composition, and the segment of the added mask.
+
+    Description:
+        The function adjusts the coordinates to ensure the object image is centered at the specified (x, y) location.
+        It then calculates the intersection of the object image with the bounds of the image composition, applies the object
+        image and mask to the corresponding regions, and updates the mask composition using the provided idx. The function
+        handles different cases based on the boundaries and whether the specified coordinates are inside the composition.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection.
     """
     h_comp, w_comp = img_comp.shape[0], img_comp.shape[1]
 
@@ -363,18 +387,42 @@ def add_obj(img_comp, mask_comp, img, mask, x, y, idx):
 
     return img_comp, mask_comp, mask_added
 
-
 def create_bg_with_noise(
-    files_bg_imgs,
-    files_bg_noise_imgs,
-    files_bg_noise_masks,
-    bg_max=1920,
-    bg_min=1080,
-    max_objs_to_add=60,
-    longest_bg_noise_max=1000,
-    longest_bg_noise_min=200,
-    blank_bg=False,
-):
+    files_bg_imgs: List[str],
+    files_bg_noise_imgs: List[str],
+    files_bg_noise_masks: List[str],
+    bg_max: int,
+    bg_min: int,
+    max_objs_to_add: int,
+    longest_bg_noise_max: int,
+    longest_bg_noise_min: int,
+    blank_bg: bool
+) -> np.ndarray:
+    """
+    Creates a background image by optionally adding noise objects to either a plain or pre-existing background image.
+
+    Parameters:
+        files_bg_imgs (List[str]): File paths to background images.
+        files_bg_noise_imgs (List[str]): File paths to noise images that can be added to the background.
+        files_bg_noise_masks (List[str]): File paths to masks corresponding to the noise images.
+        bg_max (int): The maximum dimension for resizing the background image.
+        bg_min (int): The minimum dimension for resizing the background image.
+        max_objs_to_add (int): The maximum number of noise objects to add to the background.
+        longest_bg_noise_max (int): The maximum dimension for resizing the noise objects.
+        longest_bg_noise_min (int): The minimum dimension for resizing the noise objects.
+        blank_bg (bool): If True, starts with a blank white background; otherwise, uses a random background image.
+
+    Returns:
+        np.ndarray: The generated background image with added noise objects in CV2 RGB format.
+
+    Notes:
+        This function randomly selects a background image from `files_bg_imgs` unless a blank background is specified.
+        It then randomly selects and adds noise objects up to `max_objs_to_add` times to the background. Each object and its
+        mask are resized and transformed before being added. The resizing and transformation of images depend on the specified
+        minimum and maximum dimensions. Noise objects are chosen randomly, and their placement on the background is also random.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection. 
+    """
     if blank_bg:
         img_comp_bg = np.ones((bg_min, bg_max, 3), dtype=np.uint8) * 255
         mask_comp_bg = np.zeros((bg_min, bg_max), dtype=np.uint8)
@@ -407,16 +455,37 @@ def create_bg_with_noise(
     return img_comp_bg
 
 
-def check_areas(mask_comp, obj_areas, overlap_degree=0.3):
-    obj_ids = np.unique(mask_comp).astype(np.uint8)[1:-1]
+def check_areas(mask_comp: np.ndarray, obj_areas: list, overlap_degree: float = 0.3) -> bool:
+    """
+    Checks if the area overlap between objects in an image composition exceeds a specified degree.
+
+    Parameters:
+        mask_comp (np.ndarray): A 2D array representing the mask composition where different values correspond to different objects.
+        obj_areas (list): A list containing the area (in pixels) of each object when it was first placed in the composition.
+        overlap_degree (float, optional): The maximum allowable proportion of overlap relative to the original object area. Defaults to 0.3.
+
+    Returns:
+        bool: True if the area overlaps are within the acceptable limits, False otherwise.
+
+    Description:
+        The function compares the areas of each object in the composition mask to their original areas when first placed.
+        If any object's current area in the composition is less than its original area minus the allowed overlap degree,
+        it suggests significant overlap with other objects and the function returns False. This is crucial for applications
+        where object independence in detection or analysis is necessary.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection. 
+    """
+    obj_ids = np.unique(mask_comp).astype(np.uint8)[1:-1]  # Skip the background (typically 0) and exclude the last ID if unused
     masks = mask_comp == obj_ids[:, None, None]
 
-    ok = True
+    ok = True  # Assume no excessive overlap by default
 
+    # Check for consistency in object IDs, implying no new IDs without corresponding masks
     if len(np.unique(mask_comp)) != np.max(mask_comp) + 1:
         ok = False
         return ok
 
+    # Verify each object's area against its initial area factoring in permissible overlap
     for idx, mask in enumerate(masks):
         if np.count_nonzero(mask) / obj_areas[idx] < 1 - overlap_degree:
             ok = False
@@ -424,10 +493,34 @@ def check_areas(mask_comp, obj_areas, overlap_degree=0.3):
 
     return ok
 
-
 def create_composition(
-    img_comp_bg, max_objs=15, overlap_degree=0.2, max_attempts_per_obj=10
-):
+    img_comp_bg: np.ndarray, 
+    max_objs: int, 
+    overlap_degree: float, 
+    max_attempts_per_obj: int
+) -> tuple:
+    """
+    Creates a composite image by randomly placing objects onto a background image with constraints on overlap and number of attempts.
+
+    Parameters:
+        img_comp_bg (np.ndarray): The background image on which objects will be added.
+        max_objs (int): The maximum number of objects to attempt to add to the background.
+        overlap_degree (float): A threshold for the acceptable degree of overlap between objects.
+        max_attempts_per_obj (int): The maximum number of attempts to place each object before moving to the next.
+
+    Returns:
+        tuple: A tuple containing the composite image (np.ndarray), the composite mask (np.ndarray), 
+               a list of labels corresponding to the objects added (list), and a list of areas for each object mask (list).
+
+    Description:
+        The function iterates over a randomly determined number of objects (not exceeding max_objs) to add to the background.
+        Each object is selected from a pre-defined dictionary `obj_dict` which is expected to be generated by the `obj_list` function.
+        The objects are resized and transformed based on predefined criteria and are attempted to be added to the image composition,
+        checking for overlap constraints. If the placement of an object violates the overlap degree, the attempt is aborted and retried.
+        The process respects the maximum number of placement attempts for each object.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection. 
+    """
     obj_dict=obj_list()
     img_comp = img_comp_bg.copy()
     h, w = img_comp.shape[0], img_comp.shape[1]
@@ -481,7 +574,27 @@ def create_composition(
     return img_comp, mask_comp, labels_comp, obj_areas
 
 
-def create_yolo_annotations(mask_comp, labels_comp):
+def create_yolo_annotations(mask_comp: np.ndarray, labels_comp: np.ndarray) -> list:
+    """
+    Generate YOLO format annotations for objects identified in a mask with associated labels.
+
+    Parameters:
+        mask_comp (np.ndarray): A 2D array where each pixel's integer value represents the object ID.
+        labels_comp (np.ndarray): An array containing the labels corresponding to each object ID in mask_comp.
+
+    Returns:
+        list: A list of lists, where each inner list contains normalized bounding box information
+              and the label for an object in YOLO format ([class_id, x_center, y_center, width, height]).
+
+    Notes:
+        The function expects `mask_comp` to be a grayscale image where different values correspond to
+        different objects. `labels_comp` is expected to be an array where each entry corresponds to a label
+        for the objects identified in `mask_comp`. The function calculates the bounding box coordinates for
+        each object, normalizes these coordinates relative to the dimensions of `mask_comp`, and formats
+        them according to the YOLO annotation standard.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection. 
+    """
     comp_w, comp_h = mask_comp.shape[1], mask_comp.shape[0]
 
     obj_ids = np.unique(mask_comp).astype(np.uint8)[1:]
@@ -513,16 +626,41 @@ def create_yolo_annotations(mask_comp, labels_comp):
     return annotations_yolo
 
 
-def generate_dataset(imgs_number, folder, split="train"):
+def generate_dataset(imgs_number: int, folder: str, split: str = "train") -> None:
+    """
+    Generates a dataset of synthetic images and corresponding annotations based on specified parameters.
+
+    Parameters:
+        imgs_number (int): The number of images to generate.
+        folder (str): The base directory where the dataset should be stored.
+        split (str, optional): The category of the dataset, e.g., 'train', 'test', 'val'. Defaults to 'train'.
+
+    Description:
+        This function generates a specified number of synthetic images by creating backgrounds with noise
+        and adding compositions of objects. Each image is then saved in a specified folder under a specific
+        dataset split category. Corresponding annotations in YOLO format are also generated and saved.
+        Execution time per image and total time are calculated and printed at the end of the run.
+
+    Effects:
+        - Images are saved to '{folder}/{split}/images' directory.
+        - Annotations are saved to '{folder}/{split}/labels' directory.
+        - Prints the total time taken and time per image to the console.
+
+    Raises:
+        IOError: If there are issues writing the files to the disk.
+        Exception: If any of the called functions (`create_bg_with_noise`, `create_composition`, etc.) fail.
+    Citation: 
+        Function modified from https://github.com/alexppppp/synthetic-dataset-object-detection. 
+    """
     time_start = time.time()
     timing=datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     for j in tqdm(range(imgs_number)):
         img_comp_bg = create_bg_with_noise(
-            files_bg_imgs, files_bg_noise_imgs, files_bg_noise_masks, max_objs_to_add=60
+            files_bg_imgs, files_bg_noise_imgs, files_bg_noise_masks, max_objs_to_add=60, bg_max=1920, bg_min=1080, longest_bg_noise_max=1000, longest_bg_noise_min=200, blank_bg=False,
         )
 
         img_comp, mask_comp, labels_comp, _ = create_composition(
-            img_comp_bg, max_objs=15, overlap_degree=0.2, max_attempts_per_obj=10
+            img_comp_bg, max_objs=args.max_obj, overlap_degree=args.io, max_attempts_per_obj=10
         )
 
         img_comp = cv2.cvtColor(img_comp, cv2.COLOR_RGB2BGR)
@@ -546,7 +684,32 @@ def generate_dataset(imgs_number, folder, split="train"):
         "Annotations are stored in '{}'".format(os.path.join(folder, split, "labels"))
     )
 
-def mkdir():
+def mkdir() -> None:
+    """
+    Creates directories for dataset storage and manages file system navigation.
+
+    This function performs a series of operations to ensure that the necessary directories for storing
+    a dataset are present. It attempts to create a 'dataset' directory, and if it already exists, it changes
+    the working directory to it. Subdirectories for 'train', 'test', and 'val' datasets, along with their
+    respective 'images' and 'labels' subdirectories, are also created. The function handles file system
+    navigation and provides user feedback about the operations performed.
+
+    During the process, it prints the home directory, the main data path (assumed to be specified by
+    global `PATH_MAIN`), and the dataset directory. If specified by command-line arguments (using `args.erase`),
+    it can optionally delete existing datasets to allow for a clean regeneration.
+
+    Raises:
+        OSError: If directory creation or navigation fails, or if file deletion encounters issues.
+        AttributeError: If required globals like `PATH_MAIN` or `args` are not set.
+
+    Notes:
+        - The function assumes that the global variable `dataset` should be defined outside or it will be set
+          dynamically in case of exceptions during directory operations.
+        - It relies on the argparse library to handle command-line arguments, specifically checking `args.erase`
+          to determine if existing data files should be deleted.
+        - The function does not return any values but prints details about the operations and their outcomes
+          to the console.
+    """
     try:
         print("\n\n Checking Project Paths:")
         home = os.path.abspath(os.getcwd())
@@ -593,8 +756,31 @@ def mkdir():
             print("\n Beginning Data Generation\n")
             pass                                  
 
-#to use with generate to create CLI for first input in generate_dataset  
-def test_train_val_split():
+
+def test_train_val_split() -> None:
+    """
+    Splits a dataset into training, testing, and validation sets based on a predefined ratio.
+
+    This function determines the number of items in each subset of the dataset (training, testing,
+    validation) based on the total number of items specified by the global variable `args.n`. It follows
+    an 80/10/10 split ratio. If the total number of items is 10 or fewer, the function defaults to using
+    1000 items for the training set and evenly divides the remaining 200 items between the test and
+    validation sets.
+
+    The function prints the size of each subset to the console.
+
+    Returns:
+        tuple: A tuple containing the number of items in the test set, training set, and validation set
+        in that order.
+
+    Raises:
+        AttributeError: If `args.n` is not defined globally before calling this function.
+
+    Note:
+        The function assumes an 80/10/10 split for datasets larger than 10 items. Ensure that `args.n`
+        is defined and is an integer representing the total number of images or items in the dataset
+        before invoking this function.
+    """
     if args.n <=10:
         print("At least 10 images are needed for an 80/10/10 dataset. Using the default value of 1000 training images.")
         training_set=800
@@ -610,7 +796,32 @@ def test_train_val_split():
     return test_set, training_set, validation_set
 
 
-def generate():
+def generate() -> None:
+    """
+    Orchestrates the generation of a dataset by executing a sequence of operations.
+
+    This function performs the following tasks in sequence:
+    1. Calls `obj_list` to process object listings, assuming it prepares or manipulates
+       some required data or structures.
+    2. Calls `mkdir` to presumably create directories needed for dataset storage.
+    3. Splits the dataset into training, testing, and validation sets using the `test_train_val_split` function,
+       capturing the sizes of each split.
+    4. Generates the actual dataset files for the test, validation, and training sets by calling
+       `generate_dataset` with the respective sizes and designated folders.
+
+    The function relies on external definitions and side effects from `obj_list`, `mkdir`, and `generate_dataset`.
+    These functions are expected to be implemented properly and accessible globally for `generate` to function
+    correctly.
+
+    Raises:
+        Exception: If any called function (`obj_list`, `mkdir`, `test_train_val_split`, `generate_dataset`)
+                   fails, the exception will be propagated upward, detailing the cause of the failure.
+
+    Note:
+        The function assumes all directory paths and other necessary environmental settings are correctly
+        configured before execution. Errors related to environment misconfigurations or missing resources
+        will not be handled within this function.
+    """
     obj_list()
     mkdir()
     ttv=test_train_val_split()
