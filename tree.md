@@ -1644,6 +1644,79 @@
 │   ├── untitled.mtl
 │   ├── untitled.obj
 │   └── untitled.ply
+├── GroundingDINO
+│   ├── Dockerfile
+│   ├── LICENSE
+│   ├── README.md
+│   ├── demo
+│   │   ├── create_coco_dataset.py
+│   │   ├── gradio_app.py
+│   │   ├── image_editing_with_groundingdino_gligen.ipynb
+│   │   ├── image_editing_with_groundingdino_stablediffusion.ipynb
+│   │   ├── inference_on_a_image.py
+│   │   └── test_ap_on_coco.py
+│   ├── docker_test.py
+│   ├── environment.yaml
+│   ├── groundingdino
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── GroundingDINO_SwinB_cfg.py
+│   │   │   ├── GroundingDINO_SwinT_OGC.py
+│   │   │   └── __init__.py
+│   │   ├── datasets
+│   │   │   ├── __init__.py
+│   │   │   ├── cocogrounding_eval.py
+│   │   │   └── transforms.py
+│   │   ├── models
+│   │   │   ├── GroundingDINO
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── backbone
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── backbone.py
+│   │   │   │   │   ├── position_encoding.py
+│   │   │   │   │   └── swin_transformer.py
+│   │   │   │   ├── bertwarper.py
+│   │   │   │   ├── csrc
+│   │   │   │   │   ├── MsDeformAttn
+│   │   │   │   │   │   ├── ms_deform_attn.h
+│   │   │   │   │   │   ├── ms_deform_attn_cpu.cpp
+│   │   │   │   │   │   ├── ms_deform_attn_cpu.h
+│   │   │   │   │   │   ├── ms_deform_attn_cuda.cu
+│   │   │   │   │   │   ├── ms_deform_attn_cuda.h
+│   │   │   │   │   │   └── ms_deform_im2col_cuda.cuh
+│   │   │   │   │   ├── cuda_version.cu
+│   │   │   │   │   └── vision.cpp
+│   │   │   │   ├── fuse_modules.py
+│   │   │   │   ├── groundingdino.py
+│   │   │   │   ├── ms_deform_attn.py
+│   │   │   │   ├── transformer.py
+│   │   │   │   ├── transformer_vanilla.py
+│   │   │   │   └── utils.py
+│   │   │   ├── __init__.py
+│   │   │   └── registry.py
+│   │   ├── util
+│   │   │   ├── __init__.py
+│   │   │   ├── box_ops.py
+│   │   │   ├── get_tokenlizer.py
+│   │   │   ├── inference.py
+│   │   │   ├── logger.py
+│   │   │   ├── misc.py
+│   │   │   ├── slconfig.py
+│   │   │   ├── slio.py
+│   │   │   ├── time_counter.py
+│   │   │   ├── utils.py
+│   │   │   ├── visualizer.py
+│   │   │   └── vl_utils.py
+│   │   └── version.py
+│   ├── groundingdino.egg-info
+│   │   ├── PKG-INFO
+│   │   ├── SOURCES.txt
+│   │   ├── dependency_links.txt
+│   │   ├── requires.txt
+│   │   └── top_level.txt
+│   ├── requirements.txt
+│   ├── setup.py
+│   └── test.ipynb
 ├── LICENSE
 ├── Seal_Uluaq_27906.glb
 ├── TODO.txt
@@ -1668,6 +1741,7 @@
 │   └── Seal_Uluaq_27906_0_2024_04_19-10_17_24_AM_mask.png
 ├── blender_synth.py
 ├── chroma.py
+├── config.yaml
 ├── data
 │   ├── background
 │   │   ├── h_00168a88.jpg
@@ -4037,520 +4111,6 @@
 │   │       ├── 044_endblade.png
 │   │       ├── 045_endblade.png
 │   │       └── 046_endblade.png
-│   ├── glbs
-│   │   ├── Adze_Blade_6141.glb
-│   │   ├── Adze_Handle_2804.glb
-│   │   ├── Adze_Handle_28108.glb
-│   │   ├── Adze_Handle_4266.glb
-│   │   ├── Adze_Handle_47600.glb
-│   │   ├── Adze_Head_75811.glb
-│   │   ├── Adze_with_Face_2816.glb
-│   │   ├── Amulet_Case_21170.glb
-│   │   ├── Antler_Drum_Handle_47538.glb
-│   │   ├── Antler_Drum_Handle_Decorated_2806.glb
-│   │   ├── Antler_w_Caribou_Carving_23343.glb
-│   │   ├── Armor_2808.glb
-│   │   ├── Armor_77187.glb
-│   │   ├── Arrow_Reused_Fire_Stick_94157.glb
-│   │   ├── Arrow_Shaft_45320.glb
-│   │   ├── Arrow_Shaft_w_Point_2785.glb
-│   │   ├── Awl_75818.glb
-│   │   ├── Awl_78047.glb
-│   │   ├── Axe_Head_11443.glb
-│   │   ├── Axe_Head_16525.glb
-│   │   ├── Axe_Head_88651.glb
-│   │   ├── Baleen_Doll_90586.glb
-│   │   ├── Baleen_Wolf_Killer_75328.glb
-│   │   ├── Base_Ownership_Bird_Foot_27844.glb
-│   │   ├── Base_Ownership_Burn_27971.glb
-│   │   ├── Base_Ownership_Claw_6546.glb
-│   │   ├── Base_Ownership_Seal_Nose_24049.glb
-│   │   ├── Base_Ownership_Snowflake_19216.glb
-│   │   ├── Base_Ownership_Waves_1690.glb
-│   │   ├── Base_w_Pegs_75741-79651.glb
-│   │   ├── Beak_Attachment_75452.glb
-│   │   ├── Beak_Attachment_76822.glb
-│   │   ├── Bear_Mask_w_Chin_78016_36654.glb
-│   │   ├── Beetle_Earring_23990.glb
-│   │   ├── Beluga_2893.glb
-│   │   ├── Beluga_Mask_Attachment_29940.glb
-│   │   ├── Bendy_Stick_29715.glb
-│   │   ├── Bentwood_Base_Ownership_23003.glb
-│   │   ├── Bentwood_Base_Ownership_23505.glb
-│   │   ├── Bentwood_Bowl_23884.glb
-│   │   ├── Bentwood_Bowl_78035.glb
-│   │   ├── Bentwood_Bowl_no-cat-number.glb
-│   │   ├── Bentwood_Hat_Decoration_79721.glb
-│   │   ├── Bentwood_Straightner_92616.glb
-│   │   ├── Bentwood_Visor_75378.glb
-│   │   ├── Big_Spoon_24403.glb
-│   │   ├── Bird_Attachment_21422.glb
-│   │   ├── Bird_Blunt_77237.glb
-│   │   ├── Bird_Carving_23941.glb
-│   │   ├── Bird_Carving_2834.glb
-│   │   ├── Bird_Carving_75869.glb
-│   │   ├── Bird_Carving_w_Insets_23937.glb
-│   │   ├── Bird_Dart_78088.glb
-│   │   ├── Bird_Dart_Socket_Piece_26747.glb
-│   │   ├── Bird_Figurine_2845.glb
-│   │   ├── Bird_Figurine_29833.glb
-│   │   ├── Bird_Head_Toggle_78043.glb
-│   │   ├── Bird_Mask_23893-23883-23894.glb
-│   │   ├── Bird_Prong_13890.glb
-│   │   ├── Bird_Prong_75692.glb
-│   │   ├── Bird_Prong_77241.glb
-│   │   ├── Blade_w_Binding_nocatno.glb
-│   │   ├── Bone_Tool_24424.glb
-│   │   ├── Boot_Creaser_2805.glb
-│   │   ├── Bow_75742.glb
-│   │   ├── Bow_Drill_29555.glb
-│   │   ├── Bow_Fragment_1819.glb
-│   │   ├── Bow_Part_24315.glb
-│   │   ├── Bow_Part_27773.glb
-│   │   ├── Bow_Part_41663.glb
-│   │   ├── Bow_Reinforcer_48414.glb
-│   │   ├── Bowl_29622.glb
-│   │   ├── Bowl_78034.glb
-│   │   ├── Bowl_Owners_Mark_46656.glb
-│   │   ├── Broken_Mask_Seal_Nose_78014.glb
-│   │   ├── Broken_Maskette_79262.glb
-│   │   ├── Broken_Scoop_3347.glb
-│   │   ├── Broken_Scoop_3352.glb
-│   │   ├── Bug_Maskette_78005.glb
-│   │   ├── Bug_Toggle_8079.glb
-│   │   ├── Calcite_Labret_78120.glb
-│   │   ├── Caribou_Carving_77199.glb
-│   │   ├── Caribou_Hoof_Pendant_24818.glb
-│   │   ├── Caribou_Mask_78015.glb
-│   │   ├── Caribou_Toggle_75868.glb
-│   │   ├── Carved_Antler_11442.glb
-│   │   ├── Carved_Antler_23237.glb
-│   │   ├── Carved_Bone_25141.glb
-│   │   ├── Carved_Bone_5517.glb
-│   │   ├── Carved_Caribou_29713.glb
-│   │   ├── Carved_Flat_Stick_14723.glb
-│   │   ├── Carving_Tool_11438.glb
-│   │   ├── Carving_Tool_Handle_13661.glb
-│   │   ├── Carving_Tool_With_Blade_77069.glb
-│   │   ├── Carving_Tool_with_Spare_Claw_24953-25009.glb
-│   │   ├── Carving_Tool_with_Tooth_24621.glb
-│   │   ├── Charm_Box_29798.glb
-│   │   ├── Charm_Box_45318.glb
-│   │   ├── Charm_Pendant_24558.glb
-│   │   ├── Cheekbones_Face_Mask_78018.glb
-│   │   ├── Cheeky_Maskette_90588.glb
-│   │   ├── Childs_Baleen_Bow_78086.glb
-│   │   ├── Chunky_Peg_Labret_14504.glb
-│   │   ├── Chunky_Stick_Doll_23213.glb
-│   │   ├── Circle_Carving_23968.glb
-│   │   ├── Circle_Earring_23963.glb
-│   │   ├── Circles_Carving_79732.glb
-│   │   ├── Circles_Pendant_23567.glb
-│   │   ├── Clay_Lamp_50339.glb
-│   │   ├── Club_81251.glb
-│   │   ├── Crane_Head_28475.glb
-│   │   ├── Crooked_Spoon_76610.glb
-│   │   ├── Dance_Fan_Bangle_46650.glb
-│   │   ├── Dance_Rattle_Handle_29887.glb
-│   │   ├── Dipper_3023.glb
-│   │   ├── Disc_with_Painted_Circles_24735.glb
-│   │   ├── Distal_End_35684.glb
-│   │   ├── Diving_Seal_Toggle_nocatno.glb
-│   │   ├── Doll_14879.glb
-│   │   ├── Doll_23206.glb
-│   │   ├── Doll_2750.glb
-│   │   ├── Doll_2752.glb
-│   │   ├── Doll_27909.glb
-│   │   ├── Doll_75415.glb
-│   │   ├── Doll_76771.glb
-│   │   ├── Doll_76785.glb
-│   │   ├── Doll_76786.glb
-│   │   ├── Doll_76808.glb
-│   │   ├── Doll_77929.glb
-│   │   ├── Doll_78009.glb
-│   │   ├── Doll_Antler_79364.glb
-│   │   ├── Doll_Head_24413.glb
-│   │   ├── Doll_Head_27951.glb
-│   │   ├── Doll_Head_75424.glb
-│   │   ├── Doll_Painted_79356.glb
-│   │   ├── Doll_Pointed_Head_78010.glb
-│   │   ├── Doll_Pointy_Face_75390.glb
-│   │   ├── Doll_Tilted_27901.glb
-│   │   ├── Doll_w_Labrets_24412.glb
-│   │   ├── Double_Birds_21241.glb
-│   │   ├── Double_Circle_23966.glb
-│   │   ├── Double_Circle_Earring_23957.glb
-│   │   ├── Double_Face_Uluaq_22462.glb
-│   │   ├── Double_Icon_23969.glb
-│   │   ├── Driftwood_Seal_Carving_76737.glb
-│   │   ├── Drill_26753.glb
-│   │   ├── Drum_Handle_21506.glb
-│   │   ├── Drum_Handle_76941.glb
-│   │   ├── Drum_Rim_39783.glb
-│   │   ├── Drum_Rim_77172.glb
-│   │   ├── Earring_13851.glb
-│   │   ├── Earring_23554.glb
-│   │   ├── Earring_23563.glb
-│   │   ├── Earring_23959.glb
-│   │   ├── Earring_23964.glb
-│   │   ├── Earring_23967.glb
-│   │   ├── Earring_One_of_Pair_23974.glb
-│   │   ├── Face_11597.glb
-│   │   ├── Face_Carving_79363.glb
-│   │   ├── Face_Carving_Labrets_14016.glb
-│   │   ├── Feather_Attachment_22474.glb
-│   │   ├── Figurine_w_Hole_78061.glb
-│   │   ├── Fish_Amulet_24088.glb
-│   │   ├── Fish_Carving_7964.glb
-│   │   ├── Fish_Mask_Attachment_21507.glb
-│   │   ├── Fishing_Float_93439.glb
-│   │   ├── Fishing_Gear_24644.glb
-│   │   ├── Fishing_Gear_79429.glb
-│   │   ├── Fishing_Lure_75850.glb
-│   │   ├── Fishing_Lure_77246.glb
-│   │   ├── Fishing_Lure_78090.glb
-│   │   ├── Fishing_Lure_78091.glb
-│   │   ├── Fishing_Rod_76824.glb
-│   │   ├── Fishing_Weight_23271.glb
-│   │   ├── Fishing_Weight_24774.glb
-│   │   ├── Fishing_Weight_46829.glb
-│   │   ├── Fishing_Weight_4722.glb
-│   │   ├── Fishing_Weight_77213.glb
-│   │   ├── Fishing_or_Bird_Spear_23440.glb
-│   │   ├── Flat_Maskette_2735.glb
-│   │   ├── Flat_Spool_46660.glb
-│   │   ├── Flat_Spool_with_Flower_29932.glb
-│   │   ├── Foreshaft_11753.glb
-│   │   ├── Gaming_Dart_24068.glb
-│   │   ├── Gaming_Dart_29917.glb
-│   │   ├── Gaming_Piece_23519.glb
-│   │   ├── Gaming_Piece_23929.glb
-│   │   ├── Gaming_Piece_23931.glb
-│   │   ├── Gaming_Piece_2820.glb
-│   │   ├── Gaming_Piece_78055.glb
-│   │   ├── Gaming_Piece_78060.glb
-│   │   ├── Gaming_Piece_78068.glb
-│   │   ├── Gut_Scraper_23908.glb
-│   │   ├── Gut_Scraper_Decorated_14433.glb
-│   │   ├── Gut_Scraper_Spoon_25393.glb
-│   │   ├── Half_Inflator_76553.glb
-│   │   ├── Half_Mask_29825.glb
-│   │   ├── Half_Maskette_2734.glb
-│   │   ├── Half_Maskette_29827.glb
-│   │   ├── Half_Maskette_77906.glb
-│   │   ├── Half_Maskette_79270.glb
-│   │   ├── Half_Maskette_Eyebrows_75358-75360.glb
-│   │   ├── Half_Maskette_with_Paint_76730.glb
-│   │   ├── Half_Moon_14510.glb
-│   │   ├── Half_Seal_Mask_76726.glb
-│   │   ├── Half_Uluaq_88580-24979.glb
-│   │   ├── Hand_Mask_Attachment_2753.glb
-│   │   ├── Harpoon_Arrow_Socket_Piece_79706.glb
-│   │   ├── Harpoon_Line_Stretcher_12142.glb
-│   │   ├── Harpoon_Shaft_86904.glb
-│   │   ├── Harpoon_Tip_24610.glb
-│   │   ├── Harpoon_Tip_Decoration_75855.glb
-│   │   ├── Harpoon_Toggle_2836.glb
-│   │   ├── Hearth_Kit_24246_22979.glb
-│   │   ├── Holes_24980.glb
-│   │   ├── Hooked_Tip_77210.glb
-│   │   ├── Hooked_Tip_79724.glb
-│   │   ├── Inflator_4689.glb
-│   │   ├── Inflator_76552.glb
-│   │   ├── Inflator_Valve_Ivory_23527.glb
-│   │   ├── Inflator_Valve_Wooden_76554.glb
-│   │   ├── Inflator_Valve_with_Plug_24559.glb
-│   │   ├── Insert_3354.glb
-│   │   ├── Interlocking_Earring_23560.glb
-│   │   ├── Interlocking_Loops_14020.glb
-│   │   ├── Ivory_Ball_75876.glb
-│   │   ├── Ivory_Belt_Fastener_77243.glb
-│   │   ├── Ivory_Beluga_13831.glb
-│   │   ├── Ivory_Figurine_75877.glb
-│   │   ├── Ivory_Head_24648.glb
-│   │   ├── Ivory_Hook_Earring_nocatno.glb
-│   │   ├── Ivory_Labret_78039.glb
-│   │   ├── Ivory_Puffin_nocatno.glb
-│   │   ├── Ivory_Seal_Uluaq_23918.glb
-│   │   ├── Ivory_Spiral_14013.glb
-│   │   ├── Ivory_Worm_8078.glb
-│   │   ├── Jade_Drill_30502.glb
-│   │   ├── Kayak_Beam_46994.glb
-│   │   ├── Kayak_Coaming_Stanchion_9083.glb
-│   │   ├── Kayak_Harpoon_Fitting_23914.glb
-│   │   ├── Kayak_Harpoon_Fitting_2825.glb
-│   │   ├── Kayak_Harpoon_Fitting_75688.glb
-│   │   ├── Kayak_Harpoon_Fitting_78051.glb
-│   │   ├── Kayak_Model_77004.glb
-│   │   ├── Kayak_Part_29599.glb
-│   │   ├── Kayak_Prow_76573.glb
-│   │   ├── Kayak_Prow_86386.glb
-│   │   ├── Kayak_Rib_23435.glb
-│   │   ├── Kayaker_Toy_23219.glb
-│   │   ├── Knife_29816.glb
-│   │   ├── Labret_Chevrons_29809.glb
-│   │   ├── Labret_Lines_29797.glb
-│   │   ├── Ladle_36470.glb
-│   │   ├── Lance_Blade_87072.glb
-│   │   ├── Lance_Distal_End_93473.glb
-│   │   ├── Lance_Piece_28022.glb
-│   │   ├── Large_Arrow_Shaft_79718.glb
-│   │   ├── Large_Attachment_11444.glb
-│   │   ├── Large_Awl_25329.glb
-│   │   ├── Large_Base_Ownership_77844.glb
-│   │   ├── Large_Beak_Attachment_24325.glb
-│   │   ├── Large_Beak_Attachment_24379.glb
-│   │   ├── Large_Bentwood_Container_78038.glb
-│   │   ├── Large_Bird_Attachment_27851.glb
-│   │   ├── Large_Dish_30229.glb
-│   │   ├── Large_Doll_22464.glb
-│   │   ├── Large_Drill_79316.glb
-│   │   ├── Large_Drill_Bit_24477.glb
-│   │   ├── Large_Fish_Attachment_22468.glb
-│   │   ├── Large_Knife_75568.glb
-│   │   ├── Large_Knife_with_Antler_Handle_46841.glb
-│   │   ├── Large_Point_Sheath_12140.glb
-│   │   ├── Large_Seal_Uluaq_Handle_33321.glb
-│   │   ├── Large_Socket_Piece_14014.glb
-│   │   ├── Large_Spoon_77047.glb
-│   │   ├── Large_Uluaq_Handle_78309.glb
-│   │   ├── Large_Uluaq_Handle_79253.glb
-│   │   ├── Little_People_Doll_76816.glb
-│   │   ├── Long_Beak_Attachment_77971.glb
-│   │   ├── Long_Harpoon_Tip_Antler_2783.glb
-│   │   ├── Long_Mini_Maskette_24148.glb
-│   │   ├── Long_Prong_94593.glb
-│   │   ├── Mammoth_Tusk_30232.glb
-│   │   ├── Mask_Bangle_22769-93541.glb
-│   │   ├── Mask_Fragment_Dots_77911.glb
-│   │   ├── Mask_w_Labrets_30240.glb
-│   │   ├── Maskette_24422.glb
-│   │   ├── Maskette_27880.glb
-│   │   ├── Maskette_76734.glb
-│   │   ├── Maskette_79266.glb
-│   │   ├── Maskette_90589.glb
-│   │   ├── Maskette_Half_77907.glb
-│   │   ├── Maskette_with_Cheekbones_78006.glb
-│   │   ├── Metal_Blade_Handle_77254.glb
-│   │   ├── Metal_Scalpel_38551.glb
-│   │   ├── Mini_Doll_23204.glb
-│   │   ├── Mini_Doll_23227.glb
-│   │   ├── Mini_Doll_24076.glb
-│   │   ├── Mini_Doll_29860.glb
-│   │   ├── Mini_Maskette_24100.glb
-│   │   ├── Mini_Maskette_77909.glb
-│   │   ├── Mini_Maskette_Wrinkles_76729.glb
-│   │   ├── Needle_Case_77920-77921.glb
-│   │   ├── Needle_Case_Lid_13835.glb
-│   │   ├── Needle_Case_Lid_25386.glb
-│   │   ├── Net_Gauge_22858.glb
-│   │   ├── Net_Gauge_23187.glb
-│   │   ├── Net_Gauge_78601.glb
-│   │   ├── Net_Shuttle_29664.glb
-│   │   ├── Net_Weight_23251.glb
-│   │   ├── Nose_Attachment_76830.glb
-│   │   ├── Otter_Mask_Attachment_76826.glb
-│   │   ├── Owl_Attachment_22463.glb
-│   │   ├── Owl_Figurine_27908.glb
-│   │   ├── Owl_Mask_78013.glb
-│   │   ├── Owl_Seal_Toggle_78046.glb
-│   │   ├── Paalraayak_13784.glb
-│   │   ├── Paalraayak_90601.glb
-│   │   ├── Paalraayak_Carving_14018.glb
-│   │   ├── Paalraayuk_Attachment_77960.glb
-│   │   ├── Paddle_Attachment_79393.glb
-│   │   ├── Paddle_Blade_12141.glb
-│   │   ├── Paddle_Blade_77114.glb
-│   │   ├── Paddle_Blade_with_Chopping_78302.glb
-│   │   ├── Paddle_Handle_28024.glb
-│   │   ├── Paddle_Handle_78304.glb
-│   │   ├── Paddle_Handle_79170.glb
-│   │   ├── Paddle_Handle_Doll_75389.glb
-│   │   ├── Paintbrush_33311-33313-33312.glb
-│   │   ├── Paintbrush_35500.glb
-│   │   ├── Paintbrush_95197.glb
-│   │   ├── Painted_Arrow_47341-47342-47397.glb
-│   │   ├── Painted_Head_78011.glb
-│   │   ├── Painted_Peg_Attachment_76856.glb
-│   │   ├── Part_Worked_Weight_14499.glb
-│   │   ├── Peg_Labret_78071.glb
-│   │   ├── Pendant_13859.glb
-│   │   ├── Pendant_14582.glb
-│   │   ├── Pendant_78050.glb
-│   │   ├── Pendant_79746.glb
-│   │   ├── Person_Carving_77247.glb
-│   │   ├── Person_Carving_7817.glb
-│   │   ├── Point_88787.glb
-│   │   ├── Point_90505.glb
-│   │   ├── Point_90523.glb
-│   │   ├── Point_Sheath_29883-29882.glb
-│   │   ├── Pointed_Doll_Head_13755.glb
-│   │   ├── Pointed_Head_Maskette_27738.glb
-│   │   ├── Porcupine_21237.glb
-│   │   ├── Pot_Reconstructed_50016.glb
-│   │   ├── Puffin_Head_21233.glb
-│   │   ├── Punk_9644.glb
-│   │   ├── Rectangular_Bowl_6363.glb
-│   │   ├── Rectangular_Maskette_78002.glb
-│   │   ├── Red_Ochre_90518.glb
-│   │   ├── Rock_w_Grass_Wrapping_30461.glb
-│   │   ├── Root_Pick_45317.glb
-│   │   ├── Root_Pick_86535.glb
-│   │   ├── Root_Pick_Ownership_Mark_24946.glb
-│   │   ├── Round_Half_Maskette_79264.glb
-│   │   ├── Round_Maskette_24404.glb
-│   │   ├── Round_Maskette_with_Labrets_28107.glb
-│   │   ├── Running_Animal_Etching_11654.glb
-│   │   ├── Scalpel_76600.glb
-│   │   ├── Sea_Mammal_Dart_87375.glb
-│   │   ├── Seal_Amulet_2737.glb
-│   │   ├── Seal_Attachment_75457.glb
-│   │   ├── Seal_Attachment_76834.glb
-│   │   ├── Seal_Attachment_79399.glb
-│   │   ├── Seal_Attachment_79403.glb
-│   │   ├── Seal_Attachment_with_Peg_76839.glb
-│   │   ├── Seal_Carving_2898.glb
-│   │   ├── Seal_Carving_95133.glb
-│   │   ├── Seal_Face_75349.glb
-│   │   ├── Seal_Flipper_Attachment_21456.glb
-│   │   ├── Seal_Flipper_Attachment_27941.glb
-│   │   ├── Seal_Labret_24092.glb
-│   │   ├── Seal_Labret_24245.glb
-│   │   ├── Seal_Mask_78007.glb
-│   │   ├── Seal_Owl_Mask_Half_78020.glb
-│   │   ├── Seal_Person_Mask_75352.glb
-│   │   ├── Seal_Poke_Amulet_2899.glb
-│   │   ├── Seal_Poke_Amulet_77255.glb
-│   │   ├── Seal_Tail_Amulet_27929.glb
-│   │   ├── Seal_Toggle_13837.glb
-│   │   ├── Seal_Toggle_78045.glb
-│   │   ├── Seal_Uluaq_27906.glb
-│   │   ├── Sealskin_Twister_42485.glb
-│   │   ├── Sewing_Tool_23980.glb
-│   │   ├── Sewing_Tool_24750.glb
-│   │   ├── Sewing_Tool_29844.glb
-│   │   ├── Sewing_Tool_75714.glb
-│   │   ├── Shaman_Stick_22473.glb
-│   │   ├── Shamans_Wand_23182.glb
-│   │   ├── Shamans_Wand_24151.glb
-│   │   ├── Shoulder_Blade_with_Holes_49779.glb
-│   │   ├── Sideways_Face_Mask_11445.glb
-│   │   ├── Skull_Mask_78017.glb
-│   │   ├── Small_Beak_Attachment_24006.glb
-│   │   ├── Small_Bentwood_Container_78037.glb
-│   │   ├── Small_Bird_Prong_24587.glb
-│   │   ├── Small_Knife_24411.glb
-│   │   ├── Small_Knife_75808.glb
-│   │   ├── Small_Knife_77925.glb
-│   │   ├── Small_Point_Sheath_77837-77836.glb
-│   │   ├── Small_Spool_76599.glb
-│   │   ├── Small_Uluaq_27747.glb
-│   │   ├── Small_Uluaq_76594.glb
-│   │   ├── Small_Uluaq_76598.glb
-│   │   ├── Small_Uluaq_77866.glb
-│   │   ├── Smiling_Seal_Mask_45297.glb
-│   │   ├── Snow_Goggles_22465.glb
-│   │   ├── Socket_28104.glb
-│   │   ├── Socket_75823.glb
-│   │   ├── Socket_Piece_24683.glb
-│   │   ├── Socket_Piece_4264.glb
-│   │   ├── Spear_Blade_nocatno.glb
-│   │   ├── Spear_Tip_71062.glb
-│   │   ├── Spinning_Top_12161.glb
-│   │   ├── Spinning_Top_76590.glb
-│   │   ├── Spoon_12158.glb
-│   │   ├── Spoon_2721.glb
-│   │   ├── Spoon_75559.glb
-│   │   ├── Spoon_78092.glb
-│   │   ├── Spoon_78093.glb
-│   │   ├── Spoon_with_Face_29848.glb
-│   │   ├── Squared_Awl_23353.glb
-│   │   ├── Stick_Doll_23174.glb
-│   │   ├── Stick_Doll_23195.glb
-│   │   ├── Stick_Doll_24189.glb
-│   │   ├── Stick_Doll_27820.glb
-│   │   ├── Stick_Doll_91672.glb
-│   │   ├── Stone_Labret_78067-4458.glb
-│   │   ├── Stone_Lamp_16320.glb
-│   │   ├── Stone_Lamp_16674.glb
-│   │   ├── Story_Knife_2723.glb
-│   │   ├── Tattoo_Needle_14019.glb
-│   │   ├── Tattoo_Needle_23985-24947.glb
-│   │   ├── Tattoo_Needle_40904.glb
-│   │   ├── Tattoo_Needle_78073.glb
-│   │   ├── Tattoo_Needle_79723.glb
-│   │   ├── Throwing_Board_25278.glb
-│   │   ├── Throwing_Board_75580.glb
-│   │   ├── Throwing_Board_Burning_75586.glb
-│   │   ├── Throwing_Board_Peg_75851.glb
-│   │   ├── Throwing_Board_Peg_79642.glb
-│   │   ├── Thumb_Face_78049.glb
-│   │   ├── Tiny_Drum_Handle_24228.glb
-│   │   ├── Tiny_Head_24747.glb
-│   │   ├── Tiny_Knife_Wood_96553.glb
-│   │   ├── Tiny_Toy_Harpoon_Tip_94459.glb
-│   │   ├── Tiny_Toy_Paddle_94622.glb
-│   │   ├── Toggle_Decorated_nocatno.glb
-│   │   ├── Toggling_Harpoon_14488.glb
-│   │   ├── Toggling_Harpoon_Slate_Tip_23516.glb
-│   │   ├── Tooth_Attachment_21213.glb
-│   │   ├── Tooth_Face_14881.glb
-│   │   ├── Tooth_Pendant_77283.glb
-│   │   ├── Toy_Bowl_76933.glb
-│   │   ├── Toy_Bowl_77927.glb
-│   │   ├── Toy_Catapult_Game_79388.glb
-│   │   ├── Toy_Harpoon_25951.glb
-│   │   ├── Toy_Kayak_75562.glb
-│   │   ├── Toy_Kayak_80076.glb
-│   │   ├── Toy_Kayak_Prow_79332.glb
-│   │   ├── Toy_Paddle_22770.glb
-│   │   ├── Toy_Paddle_Tiny_27810.glb
-│   │   ├── Toy_Sled_Runner_48961.glb
-│   │   ├── Toy_Spear_86473.glb
-│   │   ├── Toy_Spoon_24158.glb
-│   │   ├── Toy_Spoon_76806.glb
-│   │   ├── Toy_Throwing_Board_79515.glb
-│   │   ├── Toy_Uluaq_Handle_27726.glb
-│   │   ├── Toy_Uluaq_Handle_76597.glb
-│   │   ├── Toy_Umiak_75253.glb
-│   │   ├── Transformation_Carving_29801.glb
-│   │   ├── Triangle_Maskette_75359.glb
-│   │   ├── Tusk_Attachment_77976.glb
-│   │   ├── Twisted_Maskette_78022.glb
-│   │   ├── Uluaq_12147.glb
-│   │   ├── Uluaq_21182.glb
-│   │   ├── Uluaq_21239.glb
-│   │   ├── Uluaq_25215.glb
-│   │   ├── Uluaq_25216.glb
-│   │   ├── Uluaq_27858.glb
-│   │   ├── Uluaq_27859.glb
-│   │   ├── Uluaq_75341.glb
-│   │   ├── Uluaq_76593.glb
-│   │   ├── Uluaq_76656.glb
-│   │   ├── Uluaq_76702.glb
-│   │   ├── Uluaq_Blade_24799.glb
-│   │   ├── Uluaq_Blade_4138.glb
-│   │   ├── Uluaq_Handle_76653.glb
-│   │   ├── Uluaq_Handle_76931.glb
-│   │   ├── Uluaq_Handle_with_Ivory_Insets_75337.glb
-│   │   ├── Uluaq_with_Inlays_27926.glb
-│   │   ├── Walrus_Mask_Attachment_11437.glb
-│   │   ├── Warfare_Point_4721.glb
-│   │   ├── Wedge_81245.glb
-│   │   ├── Weight_86569.glb
-│   │   ├── Wolf_Mask_23886.glb
-│   │   ├── Wolf_Maskette_Half_29820.glb
-│   │   ├── Wood_Beluga_24007.glb
-│   │   ├── Wooden_Bow_29588.glb
-│   │   ├── Wooden_Tooth_Pendant_27805.glb
-│   │   ├── Worm_79731.glb
-│   │   ├── Worm_Earring_13860.glb
-│   │   ├── Wound_Plug_27893.glb
-│   │   ├── Wrapped_Doll_30516.glb
-│   │   ├── Yupik_Icon_23965.glb
-│   │   ├── Yupik_Icon_Earring_23561.glb
-│   │   ├── Yupik_Icon_Earring_23947.glb
-│   │   └── Yupik_Icon_Earring_78104.glb
 │   ├── tops
 │   │   ├── images
 │   │   │   ├── 001_top.jpg
@@ -4673,294 +4233,13 @@
 ├── dataset
 │   ├── test
 │   │   ├── images
-│   │   │   ├── 02024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 02024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 02024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 02024_04_23-01_10_06_PM.jpg
-│   │   │   ├── 02024_04_23-01_11_44_PM.jpg
-│   │   │   ├── 02024_04_23-01_14_31_PM.jpg
-│   │   │   ├── 02024_04_23-01_16_20_PM.jpg
-│   │   │   ├── 02024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 02024_04_23-01_18_22_PM.jpg
-│   │   │   ├── 02024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 02024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 02024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 02024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 02024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 02024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 02024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 102024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 102024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 102024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 102024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 102024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 112024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 112024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 112024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 112024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 12024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 12024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 12024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 12024_04_23-01_10_06_PM.jpg
-│   │   │   ├── 12024_04_23-01_11_44_PM.jpg
-│   │   │   ├── 12024_04_23-01_14_31_PM.jpg
-│   │   │   ├── 12024_04_23-01_16_20_PM.jpg
-│   │   │   ├── 12024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 12024_04_23-01_18_22_PM.jpg
-│   │   │   ├── 12024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 12024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 12024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 12024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 12024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 12024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 12024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 122024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 122024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 122024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 122024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 132024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 132024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 132024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 132024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 142024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 142024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 142024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 142024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 152024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 152024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 152024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 152024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 162024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 162024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 162024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 172024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 172024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 172024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 182024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 182024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 182024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 192024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 192024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 192024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 202024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 202024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 202024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 212024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 212024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 212024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 22024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 22024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 22024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 22024_04_23-01_10_06_PM.jpg
-│   │   │   ├── 22024_04_23-01_11_44_PM.jpg
-│   │   │   ├── 22024_04_23-01_14_31_PM.jpg
-│   │   │   ├── 22024_04_23-01_16_20_PM.jpg
-│   │   │   ├── 22024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 22024_04_23-01_18_22_PM.jpg
-│   │   │   ├── 22024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 22024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 22024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 22024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 22024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 22024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 22024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 222024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 222024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 232024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 232024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 242024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 242024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 252024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 252024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 262024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 262024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 272024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 272024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 282024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 282024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 292024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 292024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 302024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 302024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 312024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 312024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 32024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 32024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 32024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 32024_04_23-01_10_06_PM.jpg
-│   │   │   ├── 32024_04_23-01_11_44_PM.jpg
-│   │   │   ├── 32024_04_23-01_14_31_PM.jpg
-│   │   │   ├── 32024_04_23-01_16_20_PM.jpg
-│   │   │   ├── 32024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 32024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 32024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 32024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 32024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 32024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 32024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 32024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 322024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 322024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 332024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 332024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 342024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 342024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 352024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 352024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 362024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 362024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 372024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 372024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 382024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 382024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 392024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 392024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 402024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 402024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 412024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 412024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 42024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 42024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 42024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 42024_04_23-01_11_44_PM.jpg
-│   │   │   ├── 42024_04_23-01_14_31_PM.jpg
-│   │   │   ├── 42024_04_23-01_16_20_PM.jpg
-│   │   │   ├── 42024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 42024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 42024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 42024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 42024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 42024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 42024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 42024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 422024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 422024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 432024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 432024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 442024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 442024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 452024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 452024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 462024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 462024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 472024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 472024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 482024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 482024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 492024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 492024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 502024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 502024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 512024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 512024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 52024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 52024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 52024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 52024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 52024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 52024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 52024_04_23-12_46_09_PM.jpg
-│   │   │   ├── 52024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 52024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 52024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 52024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 522024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 522024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 532024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 532024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 542024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 542024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 552024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 552024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 562024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 562024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 572024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 572024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 582024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 582024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 592024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 592024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 602024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 602024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 612024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 612024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 62024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 62024_04_23-01_07_51_PM.jpg
-│   │   │   ├── 62024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 62024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 62024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 62024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 62024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 62024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 62024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 62024_04_23-12_56_59_PM.jpg
-│   │   │   ├── 622024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 622024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 632024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 642024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 652024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 662024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 672024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 682024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 692024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 702024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 712024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 72024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 72024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 72024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 72024_04_23-01_20_17_PM.jpg
-│   │   │   ├── 72024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 72024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 72024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 72024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 722024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 732024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 742024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 752024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 762024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 772024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 782024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 792024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 802024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 812024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 82024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 82024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 82024_04_23-01_16_59_PM.jpg
-│   │   │   ├── 82024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 82024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 82024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 82024_04_23-12_49_53_PM.jpg
-│   │   │   ├── 822024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 832024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 842024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 852024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 862024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 872024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 882024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 892024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 902024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 912024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 92024_04_23-01_03_42_PM.jpg
-│   │   │   ├── 92024_04_23-01_08_26_PM.jpg
-│   │   │   ├── 92024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 92024_04_23-12_47_02_PM.jpg
-│   │   │   ├── 92024_04_23-12_47_49_PM.jpg
-│   │   │   ├── 922024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 932024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 942024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 952024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 962024_04_23-12_42_23_PM.jpg
-│   │   │   ├── 972024_04_23-12_42_23_PM.jpg
-│   │   │   └── 982024_04_23-12_42_23_PM.jpg
+│   │   │   ├── 02024_04_24-11_55_26_AM.jpg
+│   │   │   ├── 12024_04_24-11_55_26_AM.jpg
+│   │   │   └── 22024_04_24-11_55_26_AM.jpg
 │   │   └── labels
-│   │       ├── 02024_04_23-01_20_17_PM.txt
-│   │       ├── 12024_04_23-01_20_17_PM.txt
-│   │       ├── 22024_04_23-01_20_17_PM.txt
-│   │       ├── 32024_04_23-01_20_17_PM.txt
-│   │       ├── 42024_04_23-01_20_17_PM.txt
-│   │       ├── 52024_04_23-01_20_17_PM.txt
-│   │       ├── 62024_04_23-01_20_17_PM.txt
-│   │       └── 72024_04_23-01_20_17_PM.txt
+│   │       ├── 02024_04_24-11_55_26_AM.txt
+│   │       ├── 12024_04_24-11_55_26_AM.txt
+│   │       └── 22024_04_24-11_55_26_AM.txt
 │   ├── train
 │   │   ├── images
 │   │   ├── labels
@@ -5760,6 +5039,20 @@
 │       │   └── weights
 │       │       ├── best_ulu_1_25_24.pt
 │       │       └── last.pt
+│       ├── train38
+│       │   ├── args.yaml
+│       │   └── weights
+│       ├── train39
+│       │   ├── args.yaml
+│       │   ├── labels.jpg
+│       │   ├── labels_correlogram.jpg
+│       │   ├── results.csv
+│       │   ├── train_batch0.jpg
+│       │   ├── train_batch1.jpg
+│       │   ├── train_batch2.jpg
+│       │   └── weights
+│       │       ├── best.pt
+│       │       └── last.pt
 │       ├── train4
 │       │   ├── args.yaml
 │       │   ├── labels.jpg
@@ -5942,6 +5235,7 @@
 │   ├── best_ulu_1_15_24.pt
 │   ├── best_ulu_1_25_24.onnx
 │   ├── best_ulu_1_25_24.pt
+│   ├── classes.yaml
 │   ├── detect
 │   │   ├── 001_caveg.jpg
 │   │   ├── 003_ulu.jpg
@@ -42938,4 +42232,4 @@
 │   └── yarn.lock
 └── yolov8n.pt
 
-4665 directories, 38273 files
+4680 directories, 37552 files

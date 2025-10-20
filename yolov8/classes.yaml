@@ -1,0 +1,7 @@
+path: /home/nalkuq/DINOcut/dataset
+train: /home/nalkuq/DINOcut/dataset/train
+test: /home/nalkuq/DINOcut/dataset/test
+val: /home/nalkuq/DINOcut/dataset/val
+nc: 1
+names: ['spongebob']
+

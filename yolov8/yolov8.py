@@ -12,7 +12,7 @@ for i in range(torch.cuda.device_count()):
    print(torch.cuda.get_device_properties(i).name)
 
 # Load a pretrained YOLO model (recommended for training)
-model = YOLO('best_ulu_1_25_24.pt')
+model = YOLO('best.pt')
 
 # Train the model using the 'coco128.yaml' dataset for 3 epochs
 #results = model.train(data='nunalleq.yaml', workers=1, epochs=300, imgsz=1280)

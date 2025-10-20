@@ -1,6 +1,5 @@
-+ Create Additional CLI Arguments to control Image Overlap for synthetic.py
+
 + Create log.txt Logfile for each run of synthetic.py
-+ Wrap Dictionary Comprehension and Variables in synthetic.py into def and pass
 + Create Chroma.key workflow for images in chroma.py
 + Create Updated Readme
 + Save Adobe photoshop actions as files and upload to github
